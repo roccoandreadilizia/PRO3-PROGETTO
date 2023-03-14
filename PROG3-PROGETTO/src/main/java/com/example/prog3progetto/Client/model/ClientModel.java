@@ -1,5 +1,6 @@
 package com.example.prog3progetto.Client.model;
 
+import com.example.prog3progetto.ClientController;
 import com.example.prog3progetto.Utils.Email;
 import javafx.scene.control.Alert;
 
@@ -33,7 +34,29 @@ public class ClientModel {
 
 
 
+    public static Boolean sendMail(Email e) throws IOException, EOFException{
+        boolean sent = false;
+        Socket sendSocket = new Socket("127.0.0.1", 4445);
+        outputStream = new ObjectOutputStream(sendSocket.getOutputStream()); //è ciò che mandiamo al server
 
+        outputStream.writeObject(e);
+        inputStream = new ObjectInputStream(sendSocket.getInputStream());
+
+        /*try {
+            obj = inputStream.readObject();
+            if
+        } catch (EOFException ex) {
+            throw new RuntimeException(ex);
+        }
+        */
+        outputStream.flush();
+        outputStream.close();
+
+        sendSocket.close();
+        return sent;
+
+
+    }
 
 
     public static List<Email> askMail() throws IOException {
@@ -52,12 +75,12 @@ public class ClientModel {
             casella=(List<Email>) obj;
             System.out.println("ricevuto roba");
             for (Email e: casella) {
-                e.toStringMail();
+                System.out.println(e.getTesto());
             }
 
 
         } catch (ConnectException ce) {
-            //MailListController.startAlert("Server Offline, prova a riconnetterti");
+            //ClientController.startAlert("Server Offline, prova a riconnetterti");
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -70,6 +93,7 @@ public class ClientModel {
         }
         return casella;
     }
+
 
 
 

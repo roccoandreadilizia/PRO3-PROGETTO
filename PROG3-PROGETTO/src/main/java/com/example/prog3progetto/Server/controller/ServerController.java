@@ -49,7 +49,8 @@ public class ServerController implements Initializable {
 
                     String[] user = "tizio@gmail.com".split("@");
                     List<Email> casella = new ArrayList<Email>();
-                    List<Email> newMail = FileQuery.readMailJSON();
+                    //List<Email> newMail = FileQuery.readMailJSON();
+                    List<Email> newMail = leggiCasella(user[0]);
                     casella = newMail;
                     outStream.writeObject(casella);
                 } finally {
@@ -66,7 +67,7 @@ public class ServerController implements Initializable {
     private ArrayList<Email> leggiCasella(String email) throws IOException {
         ArrayList<Email> casella= new ArrayList<>();
 
-        File file = new File( "");
+        File file = new File( "src/main/java/CASELLE/"+email+".json");
         int ll= (int) file.length();
         if(ll!=0){
             InputStream fis = new FileInputStream(file);

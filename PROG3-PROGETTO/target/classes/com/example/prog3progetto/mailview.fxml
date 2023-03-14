@@ -16,7 +16,7 @@
 
 <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0"
       prefWidth="900.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.prog3progetto.Client.controller.ClientController">
+      fx:controller="com.example.prog3progetto.ClientController">
 
     <VBox prefHeight="472.0" prefWidth="503.0" HBox.hgrow="ALWAYS">
         <HBox.margin>
@@ -52,7 +52,7 @@
                         maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false"
                         nodeOrientation="LEFT_TO_RIGHT" prefHeight="24.0" prefWidth="125.0"
                         style="-fx-background-color: purple;" text="NEW EMAIL" textAlignment="CENTER"
-                        textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="1" onAction="#scriviMail">
+                        textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="1" onAction="#nuovaMail">
                     <effect>
                         <Glow level="0.19"/>
                     </effect>
@@ -134,7 +134,7 @@
             <Label fx:id="objectLabel" text="Oggetto" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
             <Button fx:id="deleteButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                     minWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="70.0"
-                    style="-fx-background-color: #cc44ff;" text="Delete" textFill="WHITE" GridPane.columnIndex="2">
+                    style="-fx-background-color: #cc44ff;" text="Delete" textFill="WHITE" GridPane.columnIndex="2" >
 
                 <GridPane.margin>
                     <Insets left="5.0"/>
@@ -155,7 +155,7 @@
                     <Button fx:id="replayAllButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                             minWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="90.0"
                             style="-fx-background-color: purple;" text="ReplayAll" textFill="WHITE"
-                            GridPane.columnIndex="1"/>
+                            GridPane.columnIndex="1" />
                     <Button fx:id="replayButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                             minWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="90.0"
                             style="-fx-background-color: purple;" text="Replay" textFill="WHITE"/>
