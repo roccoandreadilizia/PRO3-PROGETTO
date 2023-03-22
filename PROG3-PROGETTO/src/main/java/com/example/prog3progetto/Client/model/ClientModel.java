@@ -1,7 +1,9 @@
 package com.example.prog3progetto.Client.model;
 
 import com.example.prog3progetto.ClientController;
+import com.example.prog3progetto.Utils.Coppia;
 import com.example.prog3progetto.Utils.Email;
+import com.example.prog3progetto.Utils.Utente;
 import javafx.scene.control.Alert;
 
 import java.io.EOFException;
@@ -11,6 +13,7 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.channels.Pipe;
 import java.util.List;
 
 public class ClientModel {
@@ -24,6 +27,8 @@ public class ClientModel {
     public static Object obj;
 
     private static List<Email> casella;
+
+    public static Utente utente;
 
     //lista delle mail
     //porta e ip
@@ -58,7 +63,7 @@ public class ClientModel {
 
     }
 
-//ciao
+    /** Chiedo al server la lista delle mail associate all'user */
     public static List<Email> askMail() throws IOException {
 
         try {
@@ -66,6 +71,10 @@ public class ClientModel {
                 socket = new Socket("127.0.0.1",4445);
             }
             outputStream = new ObjectOutputStream(socket.getOutputStream());//ciò che mando al server
+            Coppia c = new Coppia(2,utente);
+            outputStream.writeObject(c);
+
+
             inputStream = new ObjectInputStream(socket.getInputStream());
 
             System.out.println("Collegato");
@@ -94,7 +103,38 @@ public class ClientModel {
         return casella;
     }
 
+    public static void clientStart(String email) throws IOException{
 
+        try{
+            socket = new Socket("127.0.0.1",4445);
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+            Coppia c = new Coppia(1,email);
+            outputStream.writeObject(c);
+
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            obj = inputStream.readObject();
+
+            if(obj instanceof Utente){
+                utente = (Utente) obj;
+                System.out.println("Accesso effettuato");
+            }else{
+                System.out.println("Errore accesso");
+            }
+        outputStream.close();
+        inputStream.close();
+        socket.close();
+    } catch (ConnectException ce) {
+        ClientModel.startAlert("Server Offline, prova a riconnetterti");
+    } catch (SocketException se) {
+        se.printStackTrace();
+    } catch (IOException e) {
+        e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+
+
+    }
 
 
     public static void startAlert(List<String> notSent) {

@@ -13,12 +13,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class FileQuery {
 
+    private static final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
 
     /** Leggo il file json e restituisco la lista di mail, in base all'user passato */
     public static List<Email> readMailJSON() throws IOException {
 
         List<Email> newMailList = new ArrayList<>();
-        File file = new File("C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\tizio.json");
+        File file = new File("C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\tizio.json");
 
 
         try {

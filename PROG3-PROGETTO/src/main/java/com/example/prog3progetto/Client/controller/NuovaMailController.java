@@ -21,13 +21,23 @@ public class NuovaMailController implements Initializable {
     @FXML
     public TextArea textField;
 
+    public static String destinatari = "";
+    public static String oggetto = "";
+    public static String testo = "";
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+    /**Setto inizialmente il valore dei destinatari,dell'oggetto o del testo
+     * se sono stati precedentemente settati, altrimenti saranno vuoti */
+            destField.setText(destinatari);
+            oggettoField.setText(oggetto);
+            textField.setText(testo);
+            destinatari = "";
+            oggetto = "";
+            testo = "";
     }
 
     @FXML
-
     public void inviaMail(ActionEvent actionEvent) {
 
         try {

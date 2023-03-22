@@ -2,6 +2,7 @@ package com.example.prog3progetto;
 
 import com.example.prog3progetto.Client.model.*;
 import com.example.prog3progetto.Utils.Email;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,10 +17,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Scanner;
+import java.util.*;
 
 public class ClientController implements Initializable {
 
@@ -44,7 +42,7 @@ public class ClientController implements Initializable {
     public Button replayButton, replayAllButton, forwardButton, newMailButton, deleteButton;
 
 
-    String myUser = null;
+    public static String myUser = null;
 
 
     @Override
@@ -60,10 +58,14 @@ public class ClientController implements Initializable {
         nameUserLabel.setText(myUser);
 
         try {
-
+            ClientModel.clientStart(nameUserLabel.getText());
             refreshMail();
+
+
         } catch (RuntimeException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         //richiedi le mail
@@ -83,7 +85,7 @@ public class ClientController implements Initializable {
             for (Email e : visualizza) {
                 String mittente =e.getMittente();
                 String oggetto= e.getOggetto();
-                emailListView.getItems().add(mittente+" "+oggetto+"; "+e.getData());
+                emailListView.getItems().add(oggetto+" ----- "+e.getData());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -92,7 +94,6 @@ public class ClientController implements Initializable {
 
 
     public void nuovaMail(ActionEvent actionEvent) throws IOException {
-
         creaFinestra();
     }
 
