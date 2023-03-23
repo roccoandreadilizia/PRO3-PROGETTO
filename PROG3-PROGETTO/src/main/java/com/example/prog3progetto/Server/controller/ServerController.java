@@ -5,7 +5,6 @@ import com.example.prog3progetto.Utils.Coppia;
 import com.example.prog3progetto.Utils.CoppiaUtenteSocket;
 import com.example.prog3progetto.Utils.Email;
 import com.example.prog3progetto.Utils.Utente;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
@@ -15,12 +14,11 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class ServerController implements Initializable {
@@ -51,7 +49,22 @@ public class ServerController implements Initializable {
                 int finalI = i;//contatore dei thread
                 Socket incoming = s.accept();//questo while non va in loop infinito poichè si ferma subito in s.accept(), e aspetta che un client faccia richiesta al server
 
-                new Thread() {
+                ExecutorService exec= Executors.newFixedThreadPool(2);
+                exec.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            clients.add(new CoppiaUtenteSocket(incoming, null));//aggiungo un clients (socket-user) -> user è nullo poichè devo ancora fare il login
+                            GestoreThread(incoming, finalI);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                i++;
+                /*new Thread() {
                     @Override
                     public void run() {
 
@@ -68,7 +81,7 @@ public class ServerController implements Initializable {
                          * a meno che il main thread non sia occupato, in questo caso il thread aspetterà il suo turno
                          *
                          *  Fonte: https://www.youtube.com/watch?v=IOb9jJkKCZk
-                         * */
+                         * *//*
                         Platform.runLater(() -> {
                             try {
                                 clients.add(new CoppiaUtenteSocket(incoming, null));//aggiungo un clients (socket-user) -> user è nullo poichè devo ancora fare il login
@@ -82,7 +95,7 @@ public class ServerController implements Initializable {
                     }
                 }.start();
 
-                i++;
+                i++;*/
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -134,11 +147,92 @@ public class ServerController implements Initializable {
                                 outputStream.writeObject(user);//Scrivo nell'output del socket
                                 break;
 
+
+
                             case 2:
+
                                 //List<Email> newMail = FileQuery.readMailJSON();
                                 List<Email> newMail = leggiCasella(utente.getEmail());
                                 outputStream.writeObject(newMail);
                                 break;
+
+
+
+
+
+
+                            case 3:
+                                //caso di scrittura di una mail
+                                Email sending = (Email) c.getOggetto2();
+                                List<String> dests = sending.getDestinatari(); //estraggo i destinatari
+
+                                boolean allSent = true;
+                                Coppia result = null;
+                                List<String> notSentDests = new ArrayList<>();
+                                List<String> sentDests = new ArrayList<>();
+                                List<Utente> sentUser = new ArrayList<>();
+
+                                Boolean resUser =  null;
+
+                                for (String s : dests) {//per ogni destinatario
+                                    resUser = getUser(s);//Prendo l'user data la mail -> restituisce false se non lo trova
+                                    if(resUser == true){//se trova l'user
+                                        sentUser.add(new Utente(s) );
+                                        sentDests.add(s);
+                                    }
+                                    else { //user non trovato
+                                        allSent = false;
+                                        //variabile booleana che setto a false se non trovo un user così poi da scriverlo su teminale
+                                        notSentDests.add(s);//aggiungo il destinatario alla lista dei destinatari "non trovati"
+                                    }
+                                }
+
+                                //QUI FARE IL CHECK SE TUTTI GLI USER SONO CORRETTI
+
+
+                                sending.setDestinatario(sentDests);
+                                //setta i destinatari della nuova mail -> togliendo quelli che non ho trovato
+
+
+                                List<Email> emails = null;
+
+                                for (String u : sentDests){//per ogni user trovato nell'elenco dei destinatari
+                                    emails = leggiCasella(u);
+                                    int lastID = 0;
+                                    if(emails.size() > 0)
+                                        //se l'elenco delle mail di user non è vuoto allora prendo l'ultimo id e lo incremento
+                                        lastID = emails.get(emails.size()-1).getId() + 1;
+                                    sending.setId(lastID);//setto il nuovo id -> se l'elenco è vuoto è uguale a zero
+                                    emails.add(sending);//aggiungo la nuova email
+
+                                    scriviCasella(u,emails);//scrivo il nuovo elenco di user con la nuova mail aggiunta
+                                }
+
+
+
+                                result = new Coppia(allSent, notSentDests);
+
+
+                                printOnLog(sending.getMittente() + " Ha inviato una nuova email");//messaggio sul terminale del server
+                                for (String s: sentDests) {
+                                    printOnLog(s + " Ha ricevuto una nuova email");
+                                }
+
+                                if(!allSent)printOnLog(notSentDests + " Destinatari NON trovati");
+                                //se non ho trovato tutti i destinatari allora lo scrivo su terminale
+                                outputStream.flush();
+
+                                outputStream.writeObject(result);//mando il risultato in outputSream sul socket
+                                break;
+
+
+
+
+
+
+
+                            case 4:
+                                //caso eliminazione mail
                         }
                     }
                 }
@@ -180,6 +274,19 @@ public class ServerController implements Initializable {
         }*/
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     private ArrayList<Email> leggiCasella(String email) throws IOException {
         ArrayList<Email> casella= new ArrayList<>();
 
@@ -213,9 +320,101 @@ public class ServerController implements Initializable {
 
     }
 
-    private void scriviCasella(String email, Email lettera){
+    private synchronized void  scriviCasella(String email, List <Email> lettere) throws FileNotFoundException {
+
+
+            JsonArrayBuilder mailListBuilder = Json.createArrayBuilder();//builder per creare un array di oggetti json
+
+            for (Email e : lettere) {
+
+                JsonObjectBuilder mailBuilder = Json.createObjectBuilder();
+                JsonArrayBuilder destsBuilder = Json.createArrayBuilder();
+
+
+                //aggiungo tutti i destinatari ad un arrayJson
+                for (int i = 0; i < e.destinatari.size(); i++) {
+                    //destsBuilder.add(e.destinatari.get(i).substring(0,e.destinatari.get(i).toString().length()));
+                    //ho dovuto usare .replace altrimenti ogni volta che riscrivevo una array json mi salvava anche \"
+                    destsBuilder.add(e.destinatari.get(i).substring(0,e.destinatari.get(i).toString().length()).replace("\"", ""));
+
+
+                }
+                //inserisco tutti gli elementi della mail all'interno di un oggetto json
+                mailBuilder.add("id", e.id)
+                        .add("mittente", e.mittente)
+                        .add("destinatari", destsBuilder)
+                        .add("oggetto", e.oggetto)
+                        .add("testo", e.testo)
+                        .add("data", e.data);
+
+                //inserisco l'oggetto json all'interno dell'array json
+                mailListBuilder.add(mailBuilder);
+            }
+            JsonArray mailJsonObj = mailListBuilder.build();//costruisco tale array
+            //creo un nuovo file (o lo sovrascrivo) e lo salvo all'interno della cartella riservata all'utente
+            //che differenzio in base all'id
+            OutputStream os = new FileOutputStream(utente.userFolder());
+
+            JsonWriter jsonWriter = Json.createWriter(os);
+            jsonWriter.writeArray(mailJsonObj);//per scrivere infine l'array json all'interno del file
+            jsonWriter.close();
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void printOnLog(String msg) {
+        listLog.getItems().add(msg);
+    }
+
+
+    public static boolean getUser(String mail) throws IOException {
+
+
+            File inputFile = new File("\\src\\main\\resources\\com\\example\\prog3progetto\\utenti.txt");
+            boolean found = false;
+            BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+            String currentLine;
+            if (inputFile.exists())
+                while ((currentLine = reader.readLine()) != null) {
+                    String[] splittedLine = currentLine.split(",");
+                    if (mail.trim().equals(splittedLine[1].trim())){
+                        //se trovo la mail nel file degli user.txt
+                        found = true;
+                    }
+                }
+            else System.out.println("File Inesistente");
+            if(found)
+                return true;
+            else return false;
+
+
+    }
+
+
 
     //nella initialize crea un thread pool, in cui esegui il server socket/sochet accept while e sticazzi
     //crea un metodo per scrivere in una cassella

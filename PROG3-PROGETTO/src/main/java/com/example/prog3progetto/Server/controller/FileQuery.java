@@ -1,5 +1,5 @@
 package com.example.prog3progetto.Server.controller;
-
+/*
 import com.example.prog3progetto.Utils.Email;
 
 import javax.json.*;
@@ -16,7 +16,7 @@ public class FileQuery {
     private static final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
 
-    /** Leggo il file json e restituisco la lista di mail, in base all'user passato */
+    /** Leggo il file json e restituisco la lista di mail, in base all'user passato *//*
     public static List<Email> readMailJSON() throws IOException {
 
         List<Email> newMailList = new ArrayList<>();
@@ -54,3 +54,4 @@ public class FileQuery {
         return newMailList;
     }
 }
+*/

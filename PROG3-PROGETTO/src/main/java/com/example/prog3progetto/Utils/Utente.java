@@ -5,6 +5,9 @@ import java.io.Serializable;
 public class Utente implements Serializable {
 
     private String email;
+
+
+
     private String headerEmail;
 
     public Utente(String email) {
@@ -24,5 +27,9 @@ public class Utente implements Serializable {
     public String userFolder() {
 
         return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + headerEmail + ".json";
+    }
+
+    public String getHeaderEmail() {
+        return headerEmail;
     }
 }
