@@ -25,6 +25,8 @@ public class NuovaMailController implements Initializable {
     public static String oggetto = "";
     public static String testo = "";
 
+    public ClientModel modello;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
     /**Setto inizialmente il valore dei destinatari,dell'oggetto o del testo
@@ -37,14 +39,26 @@ public class NuovaMailController implements Initializable {
             testo = "";
     }
 
+    public void passModel(ClientModel model){
+        this.modello = model;
+
+        try {/* qui se dobbiamo gestire le reply/inoltra */
+
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
     @FXML
     public void inviaMail(ActionEvent actionEvent) {
 
-        /*try {
-            ClientModel.sendMail(new Email("tizio@gmail.com", null, oggettoField.toString(), textField.toString(), null));
+        try {
+            modello.sendMail(new Email("tizio@gmail.com", null, oggettoField.toString(), textField.toString(), null));
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }*/
+        }
         System.out.println("ciaoNuovaFinestra");
     }
 }

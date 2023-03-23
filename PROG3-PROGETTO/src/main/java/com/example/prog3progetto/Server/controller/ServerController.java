@@ -303,7 +303,8 @@ public class ServerController implements Initializable {
                 JsonObject mail=jsonArray.getJsonObject(i);
                 JsonArray destArray= mail.getJsonArray("destinatari");
                 List<String> dests=new ArrayList<>();
-                for (JsonValue s : destArray) {//scompongo l'array json di destinatari
+                for (JsonValue s : destArray) {
+                    //scompongo l'array json di destinatari
                     dests.add(s.toString());
                 }
                 Email e = new Email(mail.getString("mittente"), dests, mail.getString("oggetto"), mail.getString("testo"),

@@ -1,5 +1,6 @@
 package com.example.prog3progetto;
 
+import com.example.prog3progetto.Client.controller.NuovaMailController;
 import com.example.prog3progetto.Client.model.*;
 import com.example.prog3progetto.Utils.Email;
 import javafx.application.Platform;
@@ -14,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -119,14 +121,19 @@ public class ClientController implements Initializable {
     }
 
     public void creaFinestra() throws IOException{
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("newmail.fxml"));
-        Parent content = loader.load();
-        stage = new Stage();
-        stage.setScene(new Scene(content));
+        BorderPane root = new BorderPane();
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("newmail.fxml"));
+        root.setCenter(fxmlLoader.load());
+        NuovaMailController nuovaMailController=fxmlLoader.getController();
+        nuovaMailController.passModel(model);
+        Scene scene = new Scene(root, 200, 150);
+        stage.setTitle("Scrivi!");
+        stage.setScene(scene);
         stage.show();
 
-    }
+        }
+
+
 
     public void selectEmailFromView(MouseEvent args){
         listViewIndex = emailListView.getSelectionModel().getSelectedIndex();//seleziona l'index della mail nella list view
