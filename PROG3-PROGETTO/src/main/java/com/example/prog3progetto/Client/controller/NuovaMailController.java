@@ -40,10 +40,11 @@ public class NuovaMailController implements Initializable {
     @FXML
     public void inviaMail(ActionEvent actionEvent) {
 
-        try {
+        /*try {
             ClientModel.sendMail(new Email("tizio@gmail.com", null, oggettoField.toString(), textField.toString(), null));
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+        }*/
+        System.out.println("ciaoNuovaFinestra");
     }
 }

@@ -37,14 +37,47 @@ public class ClientModel {
     //eliminare una mail
 
 
+    /*Metodo usato in fase di inizializzazione per effettuare una sorta di login da tastiera*/
+    public void clientStart(String email) throws IOException{
+
+        try{
+            socket = new Socket("127.0.0.1",4445);
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+            Coppia c = new Coppia(1,email);
+            outputStream.writeObject(c);
+
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            obj = inputStream.readObject();
+
+            if(obj instanceof Utente){
+                utente = (Utente) obj;
+                System.out.println("Accesso effettuato");
+            }else{
+                System.out.println("Errore accesso");
+            }
+            outputStream.close();
+            inputStream.close();
+            socket.close();
+        } catch (ConnectException ce) {
+            ClientModel.startAlert("Server Offline, prova a riconnetterti");
+        } catch (SocketException se) {
+            se.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
 
-    public static Boolean sendMail(Email e) throws IOException, EOFException{
+    }
+    public Boolean sendMail(Email e) throws IOException, EOFException{
         boolean sent = false;
         Socket sendSocket = new Socket("127.0.0.1", 4445);
         outputStream = new ObjectOutputStream(sendSocket.getOutputStream()); //è ciò che mandiamo al server
 
-        outputStream.writeObject(e);
+        Coppia c = new Coppia(3,e);
+
+        outputStream.writeObject(c);
         inputStream = new ObjectInputStream(sendSocket.getInputStream());
 
         /*try {
@@ -64,7 +97,7 @@ public class ClientModel {
     }
 
     /** Chiedo al server la lista delle mail associate all'user */
-    public static List<Email> askMail() throws IOException {
+    public List<Email> askMail() throws IOException {
 
         try {
             if(socket==null||socket.isClosed()){
@@ -81,7 +114,7 @@ public class ClientModel {
 
 
             obj=inputStream.readObject();
-            casella=(List<Email>) obj;
+            casella = (List<Email>) obj;
             System.out.println("ricevuto roba");
             for (Email e: casella) {
                 System.out.println(e.getTesto());
@@ -103,38 +136,7 @@ public class ClientModel {
         return casella;
     }
 
-    public static void clientStart(String email) throws IOException{
 
-        try{
-            socket = new Socket("127.0.0.1",4445);
-            outputStream = new ObjectOutputStream(socket.getOutputStream());
-            Coppia c = new Coppia(1,email);
-            outputStream.writeObject(c);
-
-            inputStream = new ObjectInputStream(socket.getInputStream());
-            obj = inputStream.readObject();
-
-            if(obj instanceof Utente){
-                utente = (Utente) obj;
-                System.out.println("Accesso effettuato");
-            }else{
-                System.out.println("Errore accesso");
-            }
-        outputStream.close();
-        inputStream.close();
-        socket.close();
-    } catch (ConnectException ce) {
-        ClientModel.startAlert("Server Offline, prova a riconnetterti");
-    } catch (SocketException se) {
-        se.printStackTrace();
-    } catch (IOException e) {
-        e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-        e.printStackTrace();
-    }
-
-
-    }
 
 
     public static void startAlert(List<String> notSent) {
@@ -153,5 +155,9 @@ public class ClientModel {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(s);
         alert.show();
+    }
+
+    public Email getEmailFromList(int listViewIndex) {
+        return casella.get(listViewIndex);
     }
 }

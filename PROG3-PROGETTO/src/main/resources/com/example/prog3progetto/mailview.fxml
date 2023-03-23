@@ -27,7 +27,7 @@
                 <Insets left="10.0" top="10.0"/>
             </VBox.margin>
         </Label>
-        <ListView fx:id="emailListView" prefHeight="356.0" prefWidth="423.0" style="-fx-border-color: purple;">
+        <ListView fx:id="emailListView" onMouseClicked="#selectEmailFromView" prefHeight="356.0" prefWidth="423.0" style="-fx-border-color: purple;">
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
             </padding>

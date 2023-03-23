@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -41,9 +42,30 @@ public class ClientController implements Initializable {
     @FXML
     public Button replayButton, replayAllButton, forwardButton, newMailButton, deleteButton;
 
+    public int listViewIndex = 0;
+    public Email currentEmail;
 
     public static String myUser = null;
+    private ClientModel model;
 
+
+
+    
+    public void initModel(ClientModel model){
+        this.model = model;
+
+        try {
+            model.clientStart(nameUserLabel.getText());
+            refreshMail();
+
+
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -57,22 +79,6 @@ public class ClientController implements Initializable {
         myUser = s.nextLine();
         nameUserLabel.setText(myUser);
 
-        try {
-            ClientModel.clientStart(nameUserLabel.getText());
-            refreshMail();
-
-
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        //richiedi le mail
-
-        //fillare le mail
-        //scrivere benvenuto user!
-        //mettere un controlla costantemente la tua casella?
     }
 
 
@@ -81,7 +87,7 @@ public class ClientController implements Initializable {
     public void refreshMail(){
 
         try {
-            List<Email> visualizza = ClientModel.askMail();
+            List<Email> visualizza = model.askMail();
             for (Email e : visualizza) {
                 String mittente =e.getMittente();
                 String oggetto= e.getOggetto();
@@ -91,7 +97,6 @@ public class ClientController implements Initializable {
             throw new RuntimeException(e);
         }
     }
-
 
     public void nuovaMail(ActionEvent actionEvent) throws IOException {
         creaFinestra();
@@ -121,6 +126,27 @@ public class ClientController implements Initializable {
         stage.setScene(new Scene(content));
         stage.show();
 
+    }
+
+    public void selectEmailFromView(MouseEvent args){
+        listViewIndex = emailListView.getSelectionModel().getSelectedIndex();//seleziona l'index della mail nella list view
+        currentEmail = model.getEmailFromList(listViewIndex);//prende la mail corrispondente all'hash index
+
+        if (currentEmail != null) {
+            fromLabel.setText(currentEmail.getMittente());
+            toLabel.setText(currentEmail.destinatariToString().replace("\"", ""));//per eliminare le virgolette "a@a.a"
+            objectLabel.setText(currentEmail.getOggetto());
+            textLabel.setText(currentEmail.getTesto());
+
+            replayAllButton.setVisible(true);
+            replayButton.setVisible(true);
+            forwardButton.setVisible(true);
+            fromLabel.setVisible(true);
+            toLabel.setVisible(true);
+            objectLabel.setVisible(true);
+            textLabel.setVisible(true);
+            deleteButton.setVisible(true);
+        }
     }
 
 }
