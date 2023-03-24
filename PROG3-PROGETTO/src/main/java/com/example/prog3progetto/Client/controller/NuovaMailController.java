@@ -2,6 +2,7 @@ package com.example.prog3progetto.Client.controller;
 
 import com.example.prog3progetto.Client.model.ClientModel;
 import com.example.prog3progetto.Utils.Email;
+import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -10,7 +11,9 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ResourceBundle;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.util.*;
 
 public class NuovaMailController implements Initializable {
 
@@ -55,10 +58,24 @@ public class NuovaMailController implements Initializable {
     public void inviaMail(ActionEvent actionEvent) {
 
         try {
-            modello.sendMail(new Email("tizio@gmail.com", null, oggettoField.toString(), textField.toString(), null));
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            Date date = new Date();
+
+            modello.sendMail(new Email( modello.getEmail(), listaDestinatari() ,
+                    oggettoField.getText(), textField.getText(), formatter.format(date).toString()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         System.out.println("ciaoNuovaFinestra");
+    }
+
+    public List<String> listaDestinatari(){
+        List<String> dests=new ArrayList<>() ;
+        String stringazione=destField.getText();
+        String[] array=stringazione.split(";");
+        for (String s: array) {
+            dests.add(s);
+        }
+        return dests;
     }
 }

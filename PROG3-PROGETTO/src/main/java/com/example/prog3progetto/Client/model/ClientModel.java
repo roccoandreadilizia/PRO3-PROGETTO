@@ -160,4 +160,8 @@ public class ClientModel {
     public Email getEmailFromList(int listViewIndex) {
         return casella.get(listViewIndex);
     }
+
+    public String getEmail(){
+        return utente.getEmail();
+    }
 }

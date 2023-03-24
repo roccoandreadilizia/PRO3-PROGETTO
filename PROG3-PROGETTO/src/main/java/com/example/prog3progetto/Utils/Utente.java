@@ -24,10 +24,6 @@ public class Utente implements Serializable {
         this.email = email;
     }
 
-    public String userFolder() {
-
-        return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + headerEmail + ".json";
-    }
 
     public String getHeaderEmail() {
         return headerEmail;

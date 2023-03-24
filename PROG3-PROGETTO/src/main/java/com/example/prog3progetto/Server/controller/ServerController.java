@@ -165,25 +165,31 @@ public class ServerController implements Initializable {
                                 //caso di scrittura di una mail
                                 Email sending = (Email) c.getOggetto2();
                                 List<String> dests = sending.getDestinatari(); //estraggo i destinatari
-
                                 boolean allSent = true;
                                 Coppia result = null;
                                 List<String> notSentDests = new ArrayList<>();
                                 List<String> sentDests = new ArrayList<>();
-                                List<Utente> sentUser = new ArrayList<>();
+                                //List<Utente> sentUser = new ArrayList<>();
 
                                 Boolean resUser =  null;
 
                                 for (String s : dests) {//per ogni destinatario
-                                    resUser = getUser(s);//Prendo l'user data la mail -> restituisce false se non lo trova
+                                    /*resUser = getUser(s);//Prendo l'user data la mail -> restituisce false se non lo trova
                                     if(resUser == true){//se trova l'user
-                                        sentUser.add(new Utente(s) );
+                                        //sentUser.add(new Utente(s) );
                                         sentDests.add(s);
                                     }
                                     else { //user non trovato
                                         allSent = false;
                                         //variabile booleana che setto a false se non trovo un user così poi da scriverlo su teminale
                                         notSentDests.add(s);//aggiungo il destinatario alla lista dei destinatari "non trovati"
+                                    }*/
+
+                                    if(s=="tizio@gmail.com"||s.equals("caio@gmail.com")||s=="sempronio@gmail.com"){
+                                        sentDests.add(s);
+                                    }else{
+                                        allSent = false;
+                                        notSentDests.add(s);
                                     }
                                 }
 
@@ -290,7 +296,7 @@ public class ServerController implements Initializable {
     private ArrayList<Email> leggiCasella(String email) throws IOException {
         ArrayList<Email> casella= new ArrayList<>();
 
-        File file = new File(utente.userFolder());
+        File file = new File("C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + email + ".json");
         int ll= (int) file.length();
         if(ll!=0){
             InputStream fis = new FileInputStream(file);
@@ -354,7 +360,7 @@ public class ServerController implements Initializable {
             JsonArray mailJsonObj = mailListBuilder.build();//costruisco tale array
             //creo un nuovo file (o lo sovrascrivo) e lo salvo all'interno della cartella riservata all'utente
             //che differenzio in base all'id
-            OutputStream os = new FileOutputStream(utente.userFolder());
+            OutputStream os = new FileOutputStream("C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + email + ".json");
 
             JsonWriter jsonWriter = Json.createWriter(os);
             jsonWriter.writeArray(mailJsonObj);//per scrivere infine l'array json all'interno del file
@@ -395,21 +401,16 @@ public class ServerController implements Initializable {
     public static boolean getUser(String mail) throws IOException {
 
 
-            File inputFile = new File("\\src\\main\\resources\\com\\example\\prog3progetto\\utenti.txt");
+            File inputFile = new File("C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\resources\\com\\example\\prog3progetto\\utenti.txt");
             boolean found = false;
             BufferedReader reader = new BufferedReader(new FileReader(inputFile));
             String currentLine;
-            if (inputFile.exists())
+            if (inputFile.exists()){
                 while ((currentLine = reader.readLine()) != null) {
-                    String[] splittedLine = currentLine.split(",");
-                    if (mail.trim().equals(splittedLine[1].trim())){
-                        //se trovo la mail nel file degli user.txt
-                        found = true;
-                    }
+                    if(mail==currentLine){found=true;}
                 }
-            else System.out.println("File Inesistente");
-            if(found)
-                return true;
+            }else System.out.println("File Inesistente");
+            if(found) return true;
             else return false;
 
 

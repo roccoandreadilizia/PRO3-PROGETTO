@@ -16,11 +16,8 @@ public class ClientView extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("mailview.fxml"));
         root.setCenter(fxmlLoader.load());
         ClientController clientController = fxmlLoader.getController();
-
         ClientModel model = new ClientModel();
         clientController.initModel(model);
-
-
 
         Scene scene = new Scene(root, 900, 500);
         stage.setTitle("Hello!");

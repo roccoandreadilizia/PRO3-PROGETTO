@@ -109,15 +109,15 @@ public class ClientController implements Initializable {
     }
 
     public void rispondiAll(ActionEvent actionEvent) throws IOException{
-
+        creaFinestra();
     }
 
     public void rispondi(ActionEvent actionEvent) throws IOException{
-
+        creaFinestra();
     }
 
     public void inoltra(ActionEvent actionEvent) throws IOException{
-
+        creaFinestra();
     }
 
     public void creaFinestra() throws IOException{
@@ -126,18 +126,21 @@ public class ClientController implements Initializable {
         root.setCenter(fxmlLoader.load());
         NuovaMailController nuovaMailController=fxmlLoader.getController();
         nuovaMailController.passModel(model);
-        Scene scene = new Scene(root, 200, 150);
-        stage.setTitle("Scrivi!");
-        stage.setScene(scene);
-        stage.show();
+        Scene scene = new Scene(root, 800, 450);
+        Stage stages=new Stage();
+        stages.setTitle("Scrivi!");
+        stages.setScene(scene);
+        stages.show();
 
         }
 
 
 
     public void selectEmailFromView(MouseEvent args){
-        listViewIndex = emailListView.getSelectionModel().getSelectedIndex();//seleziona l'index della mail nella list view
-        currentEmail = model.getEmailFromList(listViewIndex);//prende la mail corrispondente all'hash index
+        listViewIndex = emailListView.getSelectionModel().getSelectedIndex();
+        //seleziona l'index della mail nella list view
+        currentEmail = model.getEmailFromList(listViewIndex);
+        //prende la mail corrispondente all'hash index
 
         if (currentEmail != null) {
             fromLabel.setText(currentEmail.getMittente());
