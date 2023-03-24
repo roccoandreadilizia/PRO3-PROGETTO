@@ -5,6 +5,7 @@ module com.example.prog3progetto {
     requires javafx.graphics;
     requires javafx.base;
     requires javax.json;
+    requires json.simple;
 
     exports com.example.prog3progetto.Client.controller;
     opens com.example.prog3progetto.Client.controller to javafx.fxml;

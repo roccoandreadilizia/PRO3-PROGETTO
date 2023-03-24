@@ -1,6 +1,5 @@
 package com.example.prog3progetto.Client.model;
 
-import com.example.prog3progetto.ClientController;
 import com.example.prog3progetto.Utils.Coppia;
 import com.example.prog3progetto.Utils.Email;
 import com.example.prog3progetto.Utils.Utente;
@@ -13,8 +12,8 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.channels.Pipe;
 import java.util.List;
+import java.util.Scanner;
 
 public class ClientModel {
 
@@ -40,6 +39,8 @@ public class ClientModel {
     /*Metodo usato in fase di inizializzazione per effettuare una sorta di login da tastiera*/
     public void clientStart(String email) throws IOException{
 
+
+
         try{
             socket = new Socket("127.0.0.1",4445);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -59,7 +60,7 @@ public class ClientModel {
             inputStream.close();
             socket.close();
         } catch (ConnectException ce) {
-            ClientModel.startAlert("Server Offline, prova a riconnetterti");
+            startAlert("Server Offline, prova a riconnetterti");
         } catch (SocketException se) {
             se.printStackTrace();
         } catch (IOException e) {
@@ -67,7 +68,6 @@ public class ClientModel {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
 
     }
     public Boolean sendMail(Email e) throws IOException, EOFException{
@@ -116,9 +116,7 @@ public class ClientModel {
             obj=inputStream.readObject();
             casella = (List<Email>) obj;
             System.out.println("ricevuto roba");
-            for (Email e: casella) {
-                System.out.println(e.getTesto());
-            }
+
 
 
         } catch (ConnectException ce) {
@@ -139,7 +137,7 @@ public class ClientModel {
 
 
 
-    public static void startAlert(List<String> notSent) {
+    public void startAlert(List<String> notSent) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Errore!");
         alert.setHeaderText("Destinatario NON trovato!");
@@ -151,7 +149,7 @@ public class ClientModel {
         alert.setContentText(dests);
         alert.show();
     }
-    public static void startAlert(String s) {
+    public void startAlert(String s) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(s);
         alert.show();

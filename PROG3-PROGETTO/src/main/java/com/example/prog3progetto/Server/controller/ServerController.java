@@ -148,17 +148,11 @@ public class ServerController implements Initializable {
                                 break;
 
 
-
                             case 2:
-
                                 //List<Email> newMail = FileQuery.readMailJSON();
                                 List<Email> newMail = leggiCasella(utente.getEmail());
                                 outputStream.writeObject(newMail);
                                 break;
-
-
-
-
 
 
                             case 3:
@@ -230,11 +224,6 @@ public class ServerController implements Initializable {
 
                                 outputStream.writeObject(result);//mando il risultato in outputSream sul socket
                                 break;
-
-
-
-
-
 
 
                             case 4:
@@ -367,29 +356,6 @@ public class ServerController implements Initializable {
             jsonWriter.close();
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

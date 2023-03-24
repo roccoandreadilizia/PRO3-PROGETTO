@@ -9,41 +9,41 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
-      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.prog3progetto.Client.controller.NuovaMailController">
-    <children>
-        <GridPane prefHeight="400.0" prefWidth="745.0">
-            <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="113.0" minWidth="10.0" prefWidth="62.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="284.0" minWidth="10.0" prefWidth="263.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="113.0" minWidth="10.0" prefWidth="62.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="113.0" minWidth="10.0" prefWidth="62.0" />
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="0.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="266.0" minHeight="10.0" prefHeight="230.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="261.0" minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="232.0" minHeight="10.0" prefHeight="47.0" vgrow="SOMETIMES" />
-            </rowConstraints>
-            <children>
-                <Label styleClass="labelMailView" text="A" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                <Label styleClass="labelMailView" text="Oggetto" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                <Button fx:id="sendMail" mnemonicParsing="false" onAction="#inviaMail" prefHeight="25.0" prefWidth="89.0" text="Send" GridPane.columnIndex="3" GridPane.rowIndex="13" />
-                <TextField fx:id="destField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                <TextField fx:id="oggettoField" GridPane.columnIndex="1" GridPane.rowIndex="10" />
-                <TextArea fx:id="textField" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="12" />
-            </children>
-        </GridPane>
-    </children>
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+      prefWidth="600.0"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.prog3progetto.Client.controller.NuovaMailController">
+    <GridPane prefHeight="400.0" prefWidth="745.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="113.0" minWidth="10.0" prefWidth="62.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="284.0" minWidth="10.0" prefWidth="263.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="113.0" minWidth="10.0" prefWidth="62.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="113.0" minWidth="10.0" prefWidth="62.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="30.0" minHeight="0.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="266.0" minHeight="10.0" prefHeight="230.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="261.0" minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="232.0" minHeight="10.0" prefHeight="47.0" vgrow="SOMETIMES"/>
+        </rowConstraints>
+        <Label text="A" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+        <Label text="Oggetto" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+        <Button fx:id="sendMail" mnemonicParsing="false" onAction="#inviaMail" prefHeight="25.0" prefWidth="89.0"
+                text="Send" GridPane.columnIndex="3" GridPane.rowIndex="13"/>
+        <TextField fx:id="destField" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+        <TextField fx:id="oggettoField" GridPane.columnIndex="1" GridPane.rowIndex="10"/>
+        <TextArea fx:id="textField" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1"
+                  GridPane.rowIndex="12"/>
+    </GridPane>
 </HBox>

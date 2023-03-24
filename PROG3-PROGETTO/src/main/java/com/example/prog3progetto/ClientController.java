@@ -3,12 +3,10 @@ package com.example.prog3progetto;
 import com.example.prog3progetto.Client.controller.NuovaMailController;
 import com.example.prog3progetto.Client.model.*;
 import com.example.prog3progetto.Utils.Email;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -41,8 +39,9 @@ public class ClientController implements Initializable {
     @FXML
     public Label textLabel;
 
+
     @FXML
-    public Button replayButton, replayAllButton, forwardButton, newMailButton, deleteButton;
+    public Button replayButton, replayAllButton, forwardButton, newEmailButton, deleteButton;
 
     public int listViewIndex = 0;
     public Email currentEmail;
@@ -124,15 +123,15 @@ public class ClientController implements Initializable {
         BorderPane root = new BorderPane();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("newmail.fxml"));
         root.setCenter(fxmlLoader.load());
-        NuovaMailController nuovaMailController=fxmlLoader.getController();
-        nuovaMailController.passModel(model);
-        Scene scene = new Scene(root, 800, 450);
-        Stage stages=new Stage();
-        stages.setTitle("Scrivi!");
-        stages.setScene(scene);
-        stages.show();
+        NuovaMailController nuovaMailController = fxmlLoader.getController();
+        nuovaMailController.initModel(this.model);
 
-        }
+        Scene scene = new Scene(root, 600, 400);
+        Stage stage = new Stage();
+        stage.setTitle("Hello!");
+        stage.setScene(scene);
+        stage.show();
+    }
 
 
 
@@ -158,5 +157,6 @@ public class ClientController implements Initializable {
             deleteButton.setVisible(true);
         }
     }
+
 
 }

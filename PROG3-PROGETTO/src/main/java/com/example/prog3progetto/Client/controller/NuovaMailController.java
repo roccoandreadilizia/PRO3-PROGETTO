@@ -6,6 +6,7 @@ import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
@@ -23,6 +24,8 @@ public class NuovaMailController implements Initializable {
     public TextField oggettoField;
     @FXML
     public TextArea textField;
+    @FXML
+    public Button sendMail;
 
     public static String destinatari = "";
     public static String oggetto = "";
@@ -42,7 +45,7 @@ public class NuovaMailController implements Initializable {
             testo = "";
     }
 
-    public void passModel(ClientModel model){
+    public void initModel(ClientModel model){
         this.modello = model;
 
         try {/* qui se dobbiamo gestire le reply/inoltra */
