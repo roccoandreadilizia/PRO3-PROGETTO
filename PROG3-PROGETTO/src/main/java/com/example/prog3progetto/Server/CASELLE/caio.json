@@ -1,2 +1,3 @@
 [{"id":0,"mittente":"tizio@gmail.com","destinatari":["caio@gmail.com"],"oggetto":"ciaone provolone","testo":"ciao, \ncome stai piccolino\narrivederci","data":"25/03/2023 15:09:11"},
-  {"id":1,"mittente":"tizio@gmail.com","destinatari":["caio@gmail.com"],"oggetto":"oggetto2","testo":"seconda mail di prova così per ridere","data":"25/03/2023 15:09:47"}]
+  {"id":1,"mittente":"tizio@gmail.com","destinatari":["caio@gmail.com"],"oggetto":"oggetto2","testo":"seconda mail di prova così per ridere","data":"25/03/2023 15:09:47"},
+  {"id":2,"mittente":"tizio@gmail.com","destinatari":["caio@gmail.com"],"oggetto":"aaaaaaaaaa","testo":"nnnnnnnnnnnnnnùb\nbbbbbbbbbbbbb\nbc\ncccccccccccccccc","data":"25/03/2023 16:09:08"}]

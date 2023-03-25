@@ -175,7 +175,7 @@ public class ServerController implements Initializable {
                                         notSentDests.add(s);//aggiungo il destinatario alla lista dei destinatari "non trovati"
                                     }*/
 
-                                    if(s.equals("tizio@gmail.com")||s.equals("caio@gmail.com")||s.equals("sempronio@gmail.com")){
+                                    if(existUser(s)){
                                         sentDests.add(s);
                                     }else{
                                         allSent = false;
@@ -203,8 +203,6 @@ public class ServerController implements Initializable {
 
                                     scriviCasella(u,emails);//scrivo il nuovo elenco di user con la nuova mail aggiunta
                                 }
-
-
 
                                 result = new Coppia(allSent, notSentDests);
 
@@ -268,16 +266,6 @@ public class ServerController implements Initializable {
 
 
 
-
-
-
-
-
-
-
-
-
-
     private ArrayList<Email> leggiCasella(String email) throws IOException {
         ArrayList<Email> casella= new ArrayList<>();
 
@@ -295,7 +283,6 @@ public class ServerController implements Initializable {
                 JsonArray destArray= mail.getJsonArray("destinatari");
                 List<String> dests=new ArrayList<>();
                 for (JsonValue s : destArray) {
-                    //scompongo l'array json di destinatari
                     dests.add(s.toString());
                 }
                 Email e = new Email(mail.getString("mittente"), dests, mail.getString("oggetto"), mail.getString("testo"),
@@ -311,7 +298,7 @@ public class ServerController implements Initializable {
     }
 
 
-    private synchronized void  scriviCasella(String email, List <Email> lettere) throws FileNotFoundException {
+    private synchronized void  scriviCasella(String email, List<Email> lettere) throws FileNotFoundException {
             JsonArrayBuilder mailListBuilder = Json.createArrayBuilder();
             for (Email e : lettere) {
 
@@ -319,8 +306,6 @@ public class ServerController implements Initializable {
                 JsonArrayBuilder destsBuilder = Json.createArrayBuilder();
                 for (int i = 0; i < e.destinatari.size(); i++) {
                     destsBuilder.add(e.destinatari.get(i).substring(0,e.destinatari.get(i).toString().length()).replace("\"", ""));
-
-
                 }
                 //inserisco tutti gli elementi della mail all'interno di un oggetto json
                 mailBuilder.add("id", e.id)
@@ -335,7 +320,6 @@ public class ServerController implements Initializable {
             //creo un nuovo file (o lo sovrascrivo) e lo salvo all'interno della cartella riservata all'utente
             //che differenzio in base all'id
             OutputStream os = new FileOutputStream( dataPathCasella(email));
-
             JsonWriter jsonWriter = Json.createWriter(os);
             jsonWriter.writeArray(mailJsonObj);
             //per scrivere infine l'array json all'interno del file
@@ -344,18 +328,27 @@ public class ServerController implements Initializable {
     }
 
 
-
     private void printOnLog(String msg) {
         listLog.getItems().add(msg);
     }
 
 
-    public static boolean getUser(String mail) throws IOException {
+    private boolean existUser(String mail) throws IOException {
 
-        /*/
-        pesca dal file json degli user
-         */
-        return true;
+        File file = new File(dataPathCasella("user"));
+        InputStream fis = new FileInputStream(file);
+        JsonReader jsonReader=Json.createReader(fis);
+        JsonArray arrayPartenza= jsonReader.readArray();
+        JsonObject PrimoElement= arrayPartenza.getJsonObject(0);
+        JsonArray emailCampo= PrimoElement.getJsonArray("email");
+
+        for(int i=0; i<emailCampo.size(); i++){
+            String address=emailCampo.getString(i);
+            if(mail.equals(address)){return true;}
+        }
+        jsonReader.close();
+        fis.close();
+        return false;
     }
 
 
@@ -367,8 +360,6 @@ public class ServerController implements Initializable {
 
 
     //nella initialize crea un thread pool, in cui esegui il server socket/sochet accept while e sticazzi
-    //crea un metodo per scrivere in una cassella
-    //crea un metodo per leggere tutte le mail da una cassella
 
 
 }
