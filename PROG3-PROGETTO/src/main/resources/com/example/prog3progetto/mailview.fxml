@@ -152,14 +152,14 @@
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
                 <children>
-                    <Button fx:id="replayAllButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                    <Button fx:id="replayAllButton" onAction="#rispondiAll" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                             minWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="90.0"
                             style="-fx-background-color: purple;" text="ReplayAll" textFill="WHITE"
                             GridPane.columnIndex="1" />
-                    <Button fx:id="replayButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                    <Button fx:id="replayButton" onAction="#rispondi" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                             minWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="90.0"
                             style="-fx-background-color: purple;" text="Replay" textFill="WHITE"/>
-                    <Button fx:id="forwardButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                    <Button fx:id="forwardButton" onAction="#inoltra" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                             minWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="90.0"
                             style="-fx-background-color: purple;" text="Forward" textFill="WHITE"
                             GridPane.columnIndex="2"/>

@@ -100,7 +100,10 @@ public class ClientController implements Initializable {
     }
 
     public void nuovaMail(ActionEvent actionEvent) throws IOException {
-        creaFinestra();
+        model.setBottoneCliccato(0);
+        if(model.getCurrentEmail()!=null){
+            creaFinestra();
+        }
     }
 
     public void deleteMail(ActionEvent actionEvent) throws IOException{
@@ -108,15 +111,24 @@ public class ClientController implements Initializable {
     }
 
     public void rispondiAll(ActionEvent actionEvent) throws IOException{
-        creaFinestra();
+        model.setBottoneCliccato(2);
+        if(model.getCurrentEmail()!=null){
+            creaFinestra();
+        }
     }
 
     public void rispondi(ActionEvent actionEvent) throws IOException{
-        creaFinestra();
+        model.setBottoneCliccato(1);
+        if(model.getCurrentEmail()!=null){
+            creaFinestra();
+        }
     }
 
     public void inoltra(ActionEvent actionEvent) throws IOException{
-        creaFinestra();
+        model.setBottoneCliccato(3);
+        if(model.getCurrentEmail()!=null){
+            creaFinestra();
+        }
     }
 
     public void creaFinestra() throws IOException{
@@ -135,6 +147,7 @@ public class ClientController implements Initializable {
 
 
 
+
     public void selectEmailFromView(MouseEvent args){
         listViewIndex = emailListView.getSelectionModel().getSelectedIndex();
         //seleziona l'index della mail nella list view
@@ -142,6 +155,7 @@ public class ClientController implements Initializable {
         //prende la mail corrispondente all'hash index
 
         if (currentEmail != null) {
+            model.setCurrentEmail(currentEmail);
             fromLabel.setText(currentEmail.getMittente());
             toLabel.setText(currentEmail.destinatariToString().replace("\"", ""));//per eliminare le virgolette "a@a.a"
             objectLabel.setText(currentEmail.getOggetto());

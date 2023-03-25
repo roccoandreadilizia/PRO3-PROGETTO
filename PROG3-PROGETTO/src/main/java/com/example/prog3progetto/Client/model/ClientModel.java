@@ -18,16 +18,16 @@ import java.util.Scanner;
 public class ClientModel {
 
     public static Socket socket;
-
     private static ObjectOutputStream outputStream = null;
-
     private static ObjectInputStream inputStream = null;
-
     public static Object obj;
-
     private static List<Email> casella;
+    public Utente utente;
 
-    public static Utente utente;
+
+
+    public Email currentEmail = null;
+    public  int bottoneCliccato;
 
     //lista delle mail
     //porta e ip
@@ -161,5 +161,21 @@ public class ClientModel {
 
     public String getEmail(){
         return utente.getEmail();
+    }
+
+    public Email getCurrentEmail() {
+        return currentEmail;
+    }
+
+    public void setCurrentEmail(Email currentEmail) {
+        this.currentEmail = currentEmail;
+    }
+
+    public int getBottoneCliccato() {
+        return bottoneCliccato;
+    }
+
+    public void setBottoneCliccato(int bottoneCliccato) {
+        this.bottoneCliccato = bottoneCliccato;
     }
 }

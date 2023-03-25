@@ -27,9 +27,9 @@ public class NuovaMailController implements Initializable {
     @FXML
     public Button sendMail;
 
-    public static String destinatari = "";
-    public static String oggetto = "";
-    public static String testo = "";
+    public  String destinatari = "";
+    public  String oggetto = "";
+    public  String testo = "";
 
     public ClientModel modello;
 
@@ -37,12 +37,7 @@ public class NuovaMailController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
     /**Setto inizialmente il valore dei destinatari,dell'oggetto o del testo
      * se sono stati precedentemente settati, altrimenti saranno vuoti */
-            destField.setText(destinatari);
-            oggettoField.setText(oggetto);
-            textField.setText(testo);
-            destinatari = "";
-            oggetto = "";
-            testo = "";
+
     }
 
     public void initModel(ClientModel model){
@@ -50,10 +45,52 @@ public class NuovaMailController implements Initializable {
 
         try {/* qui se dobbiamo gestire le reply/inoltra */
 
+            if(modello.getBottoneCliccato() == 0){
+                destinatari = "";
+                oggetto = "";
+                testo = "";
+            }
+            if(modello.getBottoneCliccato() == 1){
+                destinatari = model.getCurrentEmail().getMittente();
+                oggetto = "";
+                testo = "";
+            }
+            if(modello.getBottoneCliccato() == 2){
+                destinatari = destReplyAll();
+                oggetto = "";
+                testo = "";
+            }
+            if(modello.getBottoneCliccato() == 3){
+                destinatari = "";
+                oggetto = modello.getCurrentEmail().getOggetto();
+                testo = modello.getCurrentEmail().getTesto();
+            }
+
+            destField.setText(destinatari);
+            oggettoField.setText(oggetto);
+            textField.setText(testo);
+
+
         } catch (RuntimeException e) {
             e.printStackTrace();
         }
 
+    }
+
+    private String destReplyAll() {
+        //metto in un array le mail dei destinatari che sono separate da una virgola
+        String[] split = modello.getCurrentEmail().destinatariToString().split(",");
+        String tot = "";
+
+
+        for(int i = 0; i< split.length;i++){
+            String currSplit = split[i].replace("\"", "");//serve per eliminare \"
+            if(currSplit.equals(modello.getEmail())){
+            }else{
+                tot += "," + currSplit ;
+            }
+        }
+        return modello.getCurrentEmail().getMittente() + tot;
     }
 
 
@@ -80,5 +117,29 @@ public class NuovaMailController implements Initializable {
             dests.add(s);
         }
         return dests;
+    }
+
+    public String getDestinatari() {
+        return destinatari;
+    }
+
+    public void setDestinatari(String destinatari) {
+        this.destinatari = destinatari;
+    }
+
+    public String getOggetto() {
+        return oggetto;
+    }
+
+    public void setOggetto(String oggetto) {
+        this.oggetto = oggetto;
+    }
+
+    public String getTesto() {
+        return testo;
+    }
+
+    public void setTesto(String testo) {
+        this.testo = testo;
     }
 }
