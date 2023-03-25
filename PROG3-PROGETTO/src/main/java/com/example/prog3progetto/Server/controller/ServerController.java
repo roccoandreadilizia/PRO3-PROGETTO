@@ -133,15 +133,11 @@ public class ServerController implements Initializable {
                                 utente = user;
 
                                 //controllo email anche da client
-                                /*
 
-
-                                DOVREMMO METTERE UN FILE CONTENENTE DELLE EMAIL E CONFRONTARLE?
-
-                                 */
 
                                 //setto la coppia username-socket (prima username era null)
-                                ServerController.clients.set(indice - 1, new CoppiaUtenteSocket(ServerController.clients.get(indice - 1).socket, utente.getEmail()));
+                                ServerController.clients.set(indice - 1,
+                                        new CoppiaUtenteSocket(ServerController.clients.get(indice - 1).socket, utente.getEmail()));
 
                                 listLog.getItems().add("Login by " + user.getEmail());
                                 outputStream.writeObject(user);//Scrivo nell'output del socket
@@ -179,7 +175,7 @@ public class ServerController implements Initializable {
                                         notSentDests.add(s);//aggiungo il destinatario alla lista dei destinatari "non trovati"
                                     }*/
 
-                                    if(s=="tizio@gmail.com"||s.equals("caio@gmail.com")||s=="sempronio@gmail.com"){
+                                    if(s.equals("tizio@gmail.com")||s.equals("caio@gmail.com")||s.equals("sempronio@gmail.com")){
                                         sentDests.add(s);
                                     }else{
                                         allSent = false;
@@ -285,7 +281,7 @@ public class ServerController implements Initializable {
     private ArrayList<Email> leggiCasella(String email) throws IOException {
         ArrayList<Email> casella= new ArrayList<>();
 
-        File file = new File("C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + email + ".json");
+        File file = new File(dataPathCasella(email));
         int ll= (int) file.length();
         if(ll!=0){
             InputStream fis = new FileInputStream(file);
@@ -309,28 +305,19 @@ public class ServerController implements Initializable {
             }
             jsonReader.close();
         }
-
-
         return casella;
 
 
     }
 
+
     private synchronized void  scriviCasella(String email, List <Email> lettere) throws FileNotFoundException {
-
-
-            JsonArrayBuilder mailListBuilder = Json.createArrayBuilder();//builder per creare un array di oggetti json
-
+            JsonArrayBuilder mailListBuilder = Json.createArrayBuilder();
             for (Email e : lettere) {
 
                 JsonObjectBuilder mailBuilder = Json.createObjectBuilder();
                 JsonArrayBuilder destsBuilder = Json.createArrayBuilder();
-
-
-                //aggiungo tutti i destinatari ad un arrayJson
                 for (int i = 0; i < e.destinatari.size(); i++) {
-                    //destsBuilder.add(e.destinatari.get(i).substring(0,e.destinatari.get(i).toString().length()));
-                    //ho dovuto usare .replace altrimenti ogni volta che riscrivevo una array json mi salvava anche \"
                     destsBuilder.add(e.destinatari.get(i).substring(0,e.destinatari.get(i).toString().length()).replace("\"", ""));
 
 
@@ -342,17 +329,16 @@ public class ServerController implements Initializable {
                         .add("oggetto", e.oggetto)
                         .add("testo", e.testo)
                         .add("data", e.data);
-
-                //inserisco l'oggetto json all'interno dell'array json
                 mailListBuilder.add(mailBuilder);
             }
             JsonArray mailJsonObj = mailListBuilder.build();//costruisco tale array
             //creo un nuovo file (o lo sovrascrivo) e lo salvo all'interno della cartella riservata all'utente
             //che differenzio in base all'id
-            OutputStream os = new FileOutputStream("C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + email + ".json");
+            OutputStream os = new FileOutputStream( dataPathCasella(email));
 
             JsonWriter jsonWriter = Json.createWriter(os);
-            jsonWriter.writeArray(mailJsonObj);//per scrivere infine l'array json all'interno del file
+            jsonWriter.writeArray(mailJsonObj);
+            //per scrivere infine l'array json all'interno del file
             jsonWriter.close();
 
     }
@@ -366,20 +352,16 @@ public class ServerController implements Initializable {
 
     public static boolean getUser(String mail) throws IOException {
 
-
-            File inputFile = new File("C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\resources\\com\\example\\prog3progetto\\utenti.txt");
-            boolean found = false;
-            BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-            String currentLine;
-            if (inputFile.exists()){
-                while ((currentLine = reader.readLine()) != null) {
-                    if(mail==currentLine){found=true;}
-                }
-            }else System.out.println("File Inesistente");
-            if(found) return true;
-            else return false;
+        /*/
+        pesca dal file json degli user
+         */
+        return true;
+    }
 
 
+    private String dataPathCasella(String email) {
+        String[] s=email.split("@");
+        return "C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
     }
 
 
