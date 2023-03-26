@@ -71,6 +71,10 @@ public class ClientModel {
 
     }
     public Boolean sendMail(Email e) throws IOException, EOFException, ClassNotFoundException {
+        if(e.destinatari==null){
+            startAlert();
+            return false;
+        }
         boolean sent = false;
         Socket sendSocket = new Socket("127.0.0.1", 4445);
         outputStream = new ObjectOutputStream(sendSocket.getOutputStream()); //è ciò che mandiamo al server
@@ -137,16 +141,10 @@ public class ClientModel {
 
 
 
-    public void startAlert(List<String> notSent) {
+    public void startAlert() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Errore!");
         alert.setHeaderText("Destinatario NON trovato!");
-        String dests = "";
-        for (int i = 0; i < notSent.size(); i++) {
-            if(i == 0) dests += notSent.get(i);
-            else dests += " - " + notSent.get(i);
-        }
-        alert.setContentText(dests);
         alert.show();
     }
     public void startAlert(String s) {

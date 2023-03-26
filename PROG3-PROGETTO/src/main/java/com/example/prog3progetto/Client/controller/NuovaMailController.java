@@ -17,6 +17,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class NuovaMailController implements Initializable {
 
@@ -106,7 +107,6 @@ public class NuovaMailController implements Initializable {
 
             Boolean invio = modello.sendMail(new Email( modello.getEmail(), listaDestinatari() ,
                     oggettoField.getText(), textField.getText(), formatter.format(date).toString()));
-
             if(invio){
                 ClientController.stage.close();
             }else{
@@ -126,10 +126,22 @@ public class NuovaMailController implements Initializable {
         String stringazione=destField.getText();
         String[] array=stringazione.split(";");
         for (String s: array) {
+            if(validateEmail(s)){
+                return null;
+            }
             dests.add(s);
         }
         return dests;
     }
+
+    public static Boolean validateEmail(String s){
+        if(s.matches(String.valueOf(Pattern.compile("[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$", Pattern.CASE_INSENSITIVE)))){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
 
     public String getDestinatari() {
         return destinatari;

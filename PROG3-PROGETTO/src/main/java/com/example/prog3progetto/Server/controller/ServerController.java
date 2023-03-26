@@ -190,13 +190,23 @@ public class ServerController implements Initializable {
                                     }
                                 }
 
-
-
                                 break;
 
-
                             case 4:
-                                //caso eliminazione mail
+                                Coppia UserANDId= (Coppia) c.getOggetto2();
+
+                                String indirizzo= (String) UserANDId.getOggetto1();
+                                Integer idMail= (Integer) UserANDId.getOggetto2();
+
+                                eliminaMail(indirizzo, idMail);
+
+                                printOnLog("Mail ID: "+ idMail + " eliminata da: " + indirizzo);
+                                outputStream.flush();//mando il risultato in outputSream sul socket
+                                break;
+
+                            default: //chiudo l'InputStream e l'OutputStream del socket
+                                outputStream.close();
+                                inputStram.close();
                         }
                     }
                 }
@@ -239,7 +249,17 @@ public class ServerController implements Initializable {
 
 
 
+    private synchronized void eliminaMail(String email, int id) throws IOException {
 
+        ArrayList<Email> casella = leggiCasella(email);
+        for (Email e : casella) {
+            if (e.getId() == id) {
+                casella.remove(e);
+            }
+        }
+
+        scriviCasella(email, casella);
+    }
 
     private ArrayList<Email> leggiCasella(String email) throws IOException {
         ArrayList<Email> casella= new ArrayList<>();
