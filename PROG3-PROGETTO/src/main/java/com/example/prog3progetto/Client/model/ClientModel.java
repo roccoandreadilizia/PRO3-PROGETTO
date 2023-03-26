@@ -138,7 +138,46 @@ public class ClientModel {
         return casella;
     }
 
+    /** Chiedo al server di eliminare la email associata selezionata */
+    public void deleteMail(Email email) throws IOException {
 
+        try {
+            if(socket==null||socket.isClosed()){
+                socket = new Socket("127.0.0.1",4445);
+            }
+            outputStream = new ObjectOutputStream(socket.getOutputStream());//ciò che mando al server
+            Coppia c = new Coppia(utente.getEmail(),email);
+            Coppia c2 = new Coppia(4,c);
+            outputStream.writeObject(c2);
+
+            inputStream = new ObjectInputStream(socket.getInputStream());
+
+            obj=inputStream.readObject();
+
+            if(obj instanceof Boolean){
+                if((Boolean)obj){
+                   startAlert("Email eliminata!");
+                }else{
+                    startAlert("Email NON eliminata!");
+                }
+            }
+
+
+        } catch (ConnectException ce) {
+            //ClientController.startAlert("Server Offline, prova a riconnetterti");
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (EOFException e) {
+            e.printStackTrace();
+        } finally {
+            //outputStream.flush();
+            //outputStream.close();
+
+        }
+
+    }
 
 
     public void startAlert() {

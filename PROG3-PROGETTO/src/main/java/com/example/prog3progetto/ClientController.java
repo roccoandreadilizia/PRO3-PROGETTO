@@ -107,7 +107,11 @@ public class ClientController implements Initializable {
     }
 
     public void deleteMail(ActionEvent actionEvent) throws IOException{
-
+        model.setBottoneCliccato(5);
+        if(model.getCurrentEmail()!=null){
+            model.deleteMail(model.getCurrentEmail());
+            refreshMail();
+        }
     }
 
     public void rispondiAll(ActionEvent actionEvent) throws IOException{

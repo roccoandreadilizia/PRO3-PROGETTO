@@ -193,15 +193,25 @@ public class ServerController implements Initializable {
                                 break;
 
                             case 4:
+                                System.out.println("Caso eliminazione");
+                                Boolean result = false;
                                 Coppia UserANDId= (Coppia) c.getOggetto2();
 
-                                String indirizzo= (String) UserANDId.getOggetto1();
+                                String indirizzo = (String) UserANDId.getOggetto1();
                                 Integer idMail= (Integer) UserANDId.getOggetto2();
 
-                                eliminaMail(indirizzo, idMail);
+                                try{
+                                    List<Email> casella = eliminaMail(indirizzo, idMail);
+                                    scriviCasella(indirizzo,casella);
+                                    result = true;
+                                    printOnLog(utente.getEmail() + " ha eliminato una email - id : " + idMail);
+                                }catch(IOException e){
+                                    result = false;
+                                    printOnLog("Errore in fase di eliminazione di una email");
+                                    e.printStackTrace();
+                                }
 
-                                printOnLog("Mail ID: "+ idMail + " eliminata da: " + indirizzo);
-                                outputStream.flush();//mando il risultato in outputSream sul socket
+                                outputStream.writeObject(result);
                                 break;
 
                             default: //chiudo l'InputStream e l'OutputStream del socket
@@ -249,20 +259,19 @@ public class ServerController implements Initializable {
 
 
 
-    private synchronized void eliminaMail(String email, int id) throws IOException {
+    private synchronized List<Email> eliminaMail(String email, int id) throws IOException {
 
-        ArrayList<Email> casella = leggiCasella(email);
+        List<Email> casella = leggiCasella(email);
         for (Email e : casella) {
             if (e.getId() == id) {
                 casella.remove(e);
             }
         }
-
-        scriviCasella(email, casella);
+        return casella;
     }
 
-    private ArrayList<Email> leggiCasella(String email) throws IOException {
-        ArrayList<Email> casella= new ArrayList<>();
+    private List<Email> leggiCasella(String email) throws IOException {
+        List<Email> casella= new ArrayList<>();
 
         File file = new File(dataPathCasella(email));
         int ll= (int) file.length();

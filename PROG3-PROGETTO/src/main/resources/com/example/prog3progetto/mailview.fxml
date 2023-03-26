@@ -132,7 +132,7 @@
                 </font>
             </Label>
             <Label fx:id="objectLabel" text="Oggetto" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
-            <Button fx:id="deleteButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            <Button fx:id="deleteButton" onAction="#deleteMail" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                     minWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="70.0"
                     style="-fx-background-color: #cc44ff;" text="Delete" textFill="WHITE" GridPane.columnIndex="2" >
 
