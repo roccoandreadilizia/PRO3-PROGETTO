@@ -156,36 +156,40 @@ public class ServerController implements Initializable {
                                 List<String> dests = sending.getDestinatari(); //estraggo i destinatari
 
                                 //QUI FARE IL CHECK SE TUTTI GLI USER SONO CORRETTI
+                                Boolean check = true;
                                 for(String d: dests){
-                                   boolean check =  existUser(d.toString());
+                                   check =  existUser(d.toString());
                                    if(!check){
-                                       printOnLog(utente.getEmail() + " sent an mail: SENDING FAILED");
+                                       printOnLog(sending.getMittente() + " Ha inviato una nuova email: INVIO FALLITO");
                                        Boolean message = false;
                                        outputStream.writeObject(message);//Scrivo nell'output del socket
                                        break;
                                    }
                                 }
 
-                                List<Email> emails = null;
+                                if(check) {
+                                    List<Email> emails = null;
 
-                                for (String u : dests) {//per ogni user trovato nell'elenco dei destinatari
-                                    emails = leggiCasella(u);
-                                    int lastID = 0;
-                                    if (emails.size() > 0)
-                                        //se l'elenco delle mail di user non è vuoto allora prendo l'ultimo id e lo incremento
-                                        lastID = emails.get(emails.size() - 1).getId() + 1;
-                                    sending.setId(lastID);//setto il nuovo id -> se l'elenco è vuoto è uguale a zero
-                                    emails.add(sending);//aggiungo la nuova email
+                                    for (String u : dests) {//per ogni user trovato nell'elenco dei destinatari
+                                        emails = leggiCasella(u);
+                                        int lastID = 0;
+                                        if (emails.size() > 0)
+                                            //se l'elenco delle mail di user non è vuoto allora prendo l'ultimo id e lo incremento
+                                            lastID = emails.get(emails.size() - 1).getId() + 1;
+                                        sending.setId(lastID);//setto il nuovo id -> se l'elenco è vuoto è uguale a zero
+                                        emails.add(sending);//aggiungo la nuova email
 
-                                    scriviCasella(u, emails);//scrivo il nuovo elenco di user con la nuova mail aggiunta
+                                        scriviCasella(u, emails);//scrivo il nuovo elenco di user con la nuova mail aggiunta
 
-                                    printOnLog(sending.getMittente() + " Ha inviato una nuova email");//messaggio sul terminale del server
-                                    for (String s: dests) {
-                                        printOnLog(s + " Ha ricevuto una nuova email");
-                                        Boolean message = true;
-                                        outputStream.writeObject(message);//Scrivo nell'output del socket
+                                        printOnLog(sending.getMittente() + " Ha inviato una nuova email");//messaggio sul terminale del server
+                                        for (String s : dests) {
+                                            printOnLog(s + " Ha ricevuto una nuova email");
+                                            Boolean message = true;
+                                            outputStream.writeObject(message);//Scrivo nell'output del socket
+                                        }
                                     }
                                 }
+
 
 
                                 break;
