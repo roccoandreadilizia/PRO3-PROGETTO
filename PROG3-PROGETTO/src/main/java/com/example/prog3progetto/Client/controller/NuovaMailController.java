@@ -109,10 +109,12 @@ public class NuovaMailController implements Initializable {
 
             if(invio){
                 ClientController.stage.close();
+            }else{
+                modello.startAlert("Campo destinatari errati!");
             }
 
         } catch (IOException e) {
-            modello.startAlert(e.getMessage());
+            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

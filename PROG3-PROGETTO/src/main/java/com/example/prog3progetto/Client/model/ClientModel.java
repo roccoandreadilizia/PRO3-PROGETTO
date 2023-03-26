@@ -2,7 +2,6 @@ package com.example.prog3progetto.Client.model;
 
 import com.example.prog3progetto.Utils.Coppia;
 import com.example.prog3progetto.Utils.Email;
-import com.example.prog3progetto.Utils.Message;
 import com.example.prog3progetto.Utils.Utente;
 import javafx.scene.control.Alert;
 
@@ -83,11 +82,9 @@ public class ClientModel {
 
         obj=inputStream.readObject();
 
-        if(obj instanceof Boolean){
+        if(obj instanceof Boolean) {
             Boolean m = (Boolean) obj;
             sent = m;
-        }else{
-            throw new IOException("Campo destinatario errato!");
         }
 
         outputStream.flush();
