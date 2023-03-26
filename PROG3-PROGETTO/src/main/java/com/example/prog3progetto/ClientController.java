@@ -139,7 +139,7 @@ public class ClientController implements Initializable {
         nuovaMailController.initModel(this.model);
 
         Scene scene = new Scene(root, 600, 400);
-        Stage stage = new Stage();
+        stage = new Stage();
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();

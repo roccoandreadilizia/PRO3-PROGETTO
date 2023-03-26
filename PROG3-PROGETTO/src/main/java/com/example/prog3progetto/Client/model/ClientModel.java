@@ -2,6 +2,7 @@ package com.example.prog3progetto.Client.model;
 
 import com.example.prog3progetto.Utils.Coppia;
 import com.example.prog3progetto.Utils.Email;
+import com.example.prog3progetto.Utils.Message;
 import com.example.prog3progetto.Utils.Utente;
 import javafx.scene.control.Alert;
 
@@ -36,7 +37,7 @@ public class ClientModel {
     //eliminare una mail
 
 
-    /*Metodo usato in fase di inizializzazione per effettuare una sorta di login da tastiera*/
+    /*Metodo usato in fase d'inizializzazzione per effettuare una sorta di login da tastiera*/
     public void clientStart(String email) throws IOException{
 
 
@@ -70,7 +71,7 @@ public class ClientModel {
         }
 
     }
-    public Boolean sendMail(Email e) throws IOException, EOFException{
+    public Boolean sendMail(Email e) throws IOException, EOFException, ClassNotFoundException {
         boolean sent = false;
         Socket sendSocket = new Socket("127.0.0.1", 4445);
         outputStream = new ObjectOutputStream(sendSocket.getOutputStream()); //è ciò che mandiamo al server
@@ -80,13 +81,15 @@ public class ClientModel {
         outputStream.writeObject(c);
         inputStream = new ObjectInputStream(sendSocket.getInputStream());
 
-        /*try {
-            obj = inputStream.readObject();
-            if
-        } catch (EOFException ex) {
-            throw new RuntimeException(ex);
+        obj=inputStream.readObject();
+
+        if(obj instanceof Boolean){
+            Boolean m = (Boolean) obj;
+            sent = m;
+        }else{
+            throw new IOException("Campo destinatario errato!");
         }
-        */
+
         outputStream.flush();
         outputStream.close();
 

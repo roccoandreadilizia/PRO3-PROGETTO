@@ -1,6 +1,7 @@
 package com.example.prog3progetto.Client.controller;
 
 import com.example.prog3progetto.Client.model.ClientModel;
+import com.example.prog3progetto.ClientController;
 import com.example.prog3progetto.Utils.Email;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
@@ -9,6 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
@@ -18,6 +20,7 @@ import java.util.*;
 
 public class NuovaMailController implements Initializable {
 
+    public static Stage stage = null;
     @FXML
     public TextField destField;
     @FXML
@@ -101,9 +104,16 @@ public class NuovaMailController implements Initializable {
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
             Date date = new Date();
 
-            modello.sendMail(new Email( modello.getEmail(), listaDestinatari() ,
+            Boolean invio = modello.sendMail(new Email( modello.getEmail(), listaDestinatari() ,
                     oggettoField.getText(), textField.getText(), formatter.format(date).toString()));
+
+            if(invio){
+                ClientController.stage.close();
+            }
+
         } catch (IOException e) {
+            modello.startAlert(e.getMessage());
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
         System.out.println("ciaoNuovaFinestra");
