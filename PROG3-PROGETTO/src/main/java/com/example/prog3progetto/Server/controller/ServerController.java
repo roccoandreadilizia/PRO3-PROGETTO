@@ -354,8 +354,8 @@ public class ServerController implements Initializable {
 
     private String dataPathCasella(String email) {
         String[] s=email.split("@");
-       /* return "C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
-       */ return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
+        return "C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";/*
+        return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";*/
 
     }
 

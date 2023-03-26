@@ -1,1 +1,3 @@
-[{"id":0,"mittente":"caio@gmail.com","destinatari":["sempronio@gmail.com"],"oggetto":"che schifo","testo":"semprinio ti odiamo,\n sei un bergamasco schifoso","data":"25/03/2023 15:15:55"}]
+[{"id":0,"mittente":"caio@gmail.com","destinatari":["sempronio@gmail.com"],"oggetto":"che schifo","testo":"semprinio ti odiamo,\n sei un bergamasco schifoso","data":"25/03/2023 15:15:55"},
+  {"id":1,"mittente":"tizio@gmail.com","destinatari":["sempronio@gmail.com"],"oggetto":"oggetto della mail","testo":"testo della mail\n\ndfdfgmlkdgm4\neferg\nerger","data":"25/03/2023 19:07:30"},
+  {"id":2,"mittente":"caio@gmail.com","destinatari":["sempronio@gmail.com"],"oggetto":"aaaaaaaaaa","testo":"nnnnnnnnnnnnnnùb\nbbbbbbbbbbbbb\nbc\ncccccccccccccccc","data":"26/03/2023 15:19:04"}]
