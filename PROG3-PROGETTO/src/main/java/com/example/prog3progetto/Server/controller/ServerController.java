@@ -1,10 +1,7 @@
 package com.example.prog3progetto.Server.controller;
 
 
-import com.example.prog3progetto.Utils.Coppia;
-import com.example.prog3progetto.Utils.CoppiaUtenteSocket;
-import com.example.prog3progetto.Utils.Email;
-import com.example.prog3progetto.Utils.Utente;
+import com.example.prog3progetto.Utils.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
@@ -28,6 +25,8 @@ public class ServerController implements Initializable {
     public Utente utente = null;
     @FXML
     private ListView listLog;
+
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -139,7 +138,7 @@ public class ServerController implements Initializable {
                                 ServerController.clients.set(indice - 1,
                                         new CoppiaUtenteSocket(ServerController.clients.get(indice - 1).socket, utente.getEmail()));
 
-                                listLog.getItems().add("Login by " + user.getEmail());
+                                printOnLog("Login by " + user.getEmail());
                                 outputStream.writeObject(user);//Scrivo nell'output del socket
                                 break;
 
@@ -155,68 +154,40 @@ public class ServerController implements Initializable {
                                 //caso di scrittura di una mail
                                 Email sending = (Email) c.getOggetto2();
                                 List<String> dests = sending.getDestinatari(); //estraggo i destinatari
-                                boolean allSent = true;
-                                Coppia result = null;
-                                List<String> notSentDests = new ArrayList<>();
-                                List<String> sentDests = new ArrayList<>();
-                                //List<Utente> sentUser = new ArrayList<>();
-
-                                Boolean resUser =  null;
-
-                                for (String s : dests) {//per ogni destinatario
-                                    /*resUser = getUser(s);//Prendo l'user data la mail -> restituisce false se non lo trova
-                                    if(resUser == true){//se trova l'user
-                                        //sentUser.add(new Utente(s) );
-                                        sentDests.add(s);
-                                    }
-                                    else { //user non trovato
-                                        allSent = false;
-                                        //variabile booleana che setto a false se non trovo un user così poi da scriverlo su teminale
-                                        notSentDests.add(s);//aggiungo il destinatario alla lista dei destinatari "non trovati"
-                                    }*/
-
-                                    if(existUser(s)){
-                                        sentDests.add(s);
-                                    }else{
-                                        allSent = false;
-                                        notSentDests.add(s);
-                                    }
-                                }
 
                                 //QUI FARE IL CHECK SE TUTTI GLI USER SONO CORRETTI
-
-
-                                sending.setDestinatario(sentDests);
-                                //setta i destinatari della nuova mail -> togliendo quelli che non ho trovato
-
+                                for(String d: dests){
+                                   boolean check =  existUser(d.toString());
+                                   if(!check){
+                                       printOnLog(utente.getEmail() + " sent an mail: SENDING FAILED");
+                                       Boolean message = false;
+                                       outputStream.writeObject(message);//Scrivo nell'output del socket
+                                       break;
+                                   }
+                                }
 
                                 List<Email> emails = null;
 
-                                for (String u : sentDests){//per ogni user trovato nell'elenco dei destinatari
+                                for (String u : dests) {//per ogni user trovato nell'elenco dei destinatari
                                     emails = leggiCasella(u);
                                     int lastID = 0;
-                                    if(emails.size() > 0)
+                                    if (emails.size() > 0)
                                         //se l'elenco delle mail di user non è vuoto allora prendo l'ultimo id e lo incremento
-                                        lastID = emails.get(emails.size()-1).getId() + 1;
+                                        lastID = emails.get(emails.size() - 1).getId() + 1;
                                     sending.setId(lastID);//setto il nuovo id -> se l'elenco è vuoto è uguale a zero
                                     emails.add(sending);//aggiungo la nuova email
 
-                                    scriviCasella(u,emails);//scrivo il nuovo elenco di user con la nuova mail aggiunta
+                                    scriviCasella(u, emails);//scrivo il nuovo elenco di user con la nuova mail aggiunta
+
+                                    printOnLog(sending.getMittente() + " Ha inviato una nuova email");//messaggio sul terminale del server
+                                    for (String s: dests) {
+                                        printOnLog(s + " Ha ricevuto una nuova email");
+                                        Boolean message = true;
+                                        outputStream.writeObject(message);//Scrivo nell'output del socket
+                                    }
                                 }
 
-                                result = new Coppia(allSent, notSentDests);
 
-
-                                printOnLog(sending.getMittente() + " Ha inviato una nuova email");//messaggio sul terminale del server
-                                for (String s: sentDests) {
-                                    printOnLog(s + " Ha ricevuto una nuova email");
-                                }
-
-                                if(!allSent)printOnLog(notSentDests + " Destinatari NON trovati");
-                                //se non ho trovato tutti i destinatari allora lo scrivo su terminale
-                                outputStream.flush();
-
-                                outputStream.writeObject(result);//mando il risultato in outputSream sul socket
                                 break;
 
 
@@ -354,8 +325,8 @@ public class ServerController implements Initializable {
 
     private String dataPathCasella(String email) {
         String[] s=email.split("@");
-        return "C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";/*
-        return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";*/
+        /*return "C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";*/
+        return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
 
     }
 
