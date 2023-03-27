@@ -193,25 +193,18 @@ public class ServerController implements Initializable {
                                 break;
 
                             case 4:
-                                System.out.println("Caso eliminazione");
-                                Boolean result = false;
                                 Coppia UserANDId= (Coppia) c.getOggetto2();
 
-                                String indirizzo = (String) UserANDId.getOggetto1();
+                                String indirizzo= (String) UserANDId.getOggetto1();
                                 Integer idMail= (Integer) UserANDId.getOggetto2();
 
-                                try{
-                                    List<Email> casella = eliminaMail(indirizzo, idMail);
-                                    scriviCasella(indirizzo,casella);
-                                    result = true;
-                                    printOnLog(utente.getEmail() + " ha eliminato una email - id : " + idMail);
-                                }catch(IOException e){
-                                    result = false;
-                                    printOnLog("Errore in fase di eliminazione di una email");
-                                    e.printStackTrace();
-                                }
+                                eliminaMail(indirizzo, idMail);
 
-                                outputStream.writeObject(result);
+                                printOnLog("Mail ID: "+ idMail + " eliminata da: " + indirizzo);
+                                /*Boolean message = true;
+                                outputStream.writeObject(message);*/
+
+                                outputStream.flush();//mando il risultato in outputStream sul socket
                                 break;
 
                             default: //chiudo l'InputStream e l'OutputStream del socket
@@ -221,6 +214,8 @@ public class ServerController implements Initializable {
                     }
                 }
             }catch (EOFException e) {
+                Boolean message = false;
+                outputStream.writeObject(message);
             } finally {//chiudo nuovamente l'InputStream e l'OutputStream del socket nel caso ci fossero state eccezioni da catturare
                 incoming.close();
                 outputStream.close();
@@ -259,19 +254,21 @@ public class ServerController implements Initializable {
 
 
 
-    private synchronized List<Email> eliminaMail(String email, int id) throws IOException {
+    private void eliminaMail(String email, int id) throws IOException {
 
-        List<Email> casella = leggiCasella(email);
+        ArrayList<Email> casella = leggiCasella(email);
         for (Email e : casella) {
             if (e.getId() == id) {
                 casella.remove(e);
+                scriviCasella(email, casella);
+                return;
             }
         }
-        return casella;
+
     }
 
-    private List<Email> leggiCasella(String email) throws IOException {
-        List<Email> casella= new ArrayList<>();
+    private ArrayList<Email> leggiCasella(String email) throws IOException {
+        ArrayList<Email> casella= new ArrayList<>();
 
         File file = new File(dataPathCasella(email));
         int ll= (int) file.length();
@@ -302,7 +299,7 @@ public class ServerController implements Initializable {
     }
 
 
-    private synchronized void  scriviCasella(String email, List<Email> lettere) throws FileNotFoundException {
+    private void  scriviCasella(String email, List<Email> lettere) throws FileNotFoundException {
             JsonArrayBuilder mailListBuilder = Json.createArrayBuilder();
             for (Email e : lettere) {
 
@@ -358,8 +355,8 @@ public class ServerController implements Initializable {
 
     private String dataPathCasella(String email) {
         String[] s=email.split("@");
-        /*return "C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";*/
-        return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
+        return "C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
+        //return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
 
     }
 

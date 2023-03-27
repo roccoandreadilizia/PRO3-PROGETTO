@@ -87,6 +87,8 @@ public class ClientController implements Initializable {
 
     public void refreshMail(){
 
+
+
         try {
             List<Email> visualizza = model.askMail();
             for (Email e : visualizza) {
@@ -110,8 +112,10 @@ public class ClientController implements Initializable {
         model.setBottoneCliccato(5);
         if(model.getCurrentEmail()!=null){
             model.deleteMail(model.getCurrentEmail());
-            refreshMail();
+
+            //prima di fare refresh mail devi cancellare quelle prima
         }
+        refreshMail();
     }
 
     public void rispondiAll(ActionEvent actionEvent) throws IOException{

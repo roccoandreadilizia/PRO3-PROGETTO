@@ -70,7 +70,8 @@ public class ClientModel {
         }
 
     }
-    public Boolean sendMail(Email e) throws IOException, EOFException, ClassNotFoundException {
+
+    public Boolean sendMail(Email e) throws IOException,ClassNotFoundException {
         if(e.destinatari==null){
             startAlert();
             return false;
@@ -142,34 +143,26 @@ public class ClientModel {
     public void deleteMail(Email email) throws IOException {
 
         try {
-            if(socket==null||socket.isClosed()){
-                socket = new Socket("127.0.0.1",4445);
-            }
-            outputStream = new ObjectOutputStream(socket.getOutputStream());//ciò che mando al server
-            Coppia c = new Coppia(utente.getEmail(),email);
+            Socket sendSocket = new Socket("127.0.0.1", 4445);
+            outputStream = new ObjectOutputStream(sendSocket.getOutputStream()); //è ciò che mandiamo al server
+
+
+
+            Coppia c = new Coppia(utente.getEmail(),email.getId());
             Coppia c2 = new Coppia(4,c);
             outputStream.writeObject(c2);
+            startAlert("email eliminata");
+            outputStream.flush();
+            outputStream.close();
 
-            inputStream = new ObjectInputStream(socket.getInputStream());
-
-            obj=inputStream.readObject();
-
-            if(obj instanceof Boolean){
-                if((Boolean)obj){
-                   startAlert("Email eliminata!");
-                }else{
-                    startAlert("Email NON eliminata!");
-                }
-            }
+            sendSocket.close();
 
 
         } catch (ConnectException ce) {
             //ClientController.startAlert("Server Offline, prova a riconnetterti");
         } catch (SocketException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (EOFException e) {
+        }  catch (EOFException e) {
             e.printStackTrace();
         } finally {
             //outputStream.flush();
@@ -186,6 +179,7 @@ public class ClientModel {
         alert.setHeaderText("Destinatario NON trovato!");
         alert.show();
     }
+
     public void startAlert(String s) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(s);
