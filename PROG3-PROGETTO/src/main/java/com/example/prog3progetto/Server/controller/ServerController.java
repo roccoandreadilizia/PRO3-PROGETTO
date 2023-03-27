@@ -2,6 +2,7 @@ package com.example.prog3progetto.Server.controller;
 
 
 import com.example.prog3progetto.Utils.*;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
@@ -28,6 +29,8 @@ public class ServerController implements Initializable {
 
 
 
+
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         new Thread(() -> socketThreadStart()).start();
@@ -42,13 +45,14 @@ public class ServerController implements Initializable {
         try {
             ServerSocket s = new ServerSocket(4445);//la porta l'ho scelta a caso, in modo che non andasse ad interferire con altri processi (ad esempio la porta 8080)
             clients = new ArrayList<>();
+            System.out.println("Creazione di un socket all'indirizzo: " + s.getLocalSocketAddress());
             int i = 1;
             while (true) {//creo un loop infinito per gestire i client che fanno richiesta di connessione al socket
 
                 int finalI = i;//contatore dei thread
                 Socket incoming = s.accept();//questo while non va in loop infinito poichè si ferma subito in s.accept(), e aspetta che un client faccia richiesta al server
 
-                ExecutorService exec= Executors.newFixedThreadPool(2);
+                /*ExecutorService exec= Executors.newFixedThreadPool(2);
                 exec.execute(new Runnable() {
                     @Override
                     public void run() {
@@ -62,8 +66,8 @@ public class ServerController implements Initializable {
                         }
                     }
                 });
-                i++;
-                /*new Thread() {
+                i++;*/
+                new Thread() {
                     @Override
                     public void run() {
 
@@ -80,7 +84,7 @@ public class ServerController implements Initializable {
                          * a meno che il main thread non sia occupato, in questo caso il thread aspetterà il suo turno
                          *
                          *  Fonte: https://www.youtube.com/watch?v=IOb9jJkKCZk
-                         * *//*
+                         * */
                         Platform.runLater(() -> {
                             try {
                                 clients.add(new CoppiaUtenteSocket(incoming, null));//aggiungo un clients (socket-user) -> user è nullo poichè devo ancora fare il login
@@ -94,7 +98,7 @@ public class ServerController implements Initializable {
                     }
                 }.start();
 
-                i++;*/
+                i++;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -145,7 +149,9 @@ public class ServerController implements Initializable {
 
                             case 2:
                                 //List<Email> newMail = FileQuery.readMailJSON();
-                                List<Email> newMail = leggiCasella(utente.getEmail());
+                                Coppia p = (Coppia) c.getOggetto2();
+
+                                List<Email> newMail = leggiCasella(utente.getEmail(), (Integer) p.getOggetto2());
                                 outputStream.writeObject(newMail);
                                 break;
 
@@ -171,7 +177,7 @@ public class ServerController implements Initializable {
                                     List<Email> emails = null;
 
                                     for (String u : dests) {//per ogni user trovato nell'elenco dei destinatari
-                                        emails = leggiCasella(u);
+                                        emails = leggiCasella(u,-1);
                                         int lastID = 0;
                                         if (emails.size() > 0)
                                             //se l'elenco delle mail di user non è vuoto allora prendo l'ultimo id e lo incremento
@@ -258,7 +264,7 @@ public class ServerController implements Initializable {
 
     private Boolean eliminaMail(String email, int id) throws IOException {
 
-        ArrayList<Email> casella = leggiCasella(email);
+        ArrayList<Email> casella = leggiCasella(email,-1);
         for (Email e : casella) {
             if (e.getId() == id) {
                 casella.remove(e);
@@ -269,7 +275,7 @@ public class ServerController implements Initializable {
         return false;
     }
 
-    private ArrayList<Email> leggiCasella(String email) throws IOException {
+    private ArrayList<Email> leggiCasella(String email,int lastID) throws IOException {
         ArrayList<Email> casella= new ArrayList<>();
 
         File file = new File(dataPathCasella(email));
@@ -291,7 +297,11 @@ public class ServerController implements Initializable {
                 Email e = new Email(mail.getString("mittente"), dests, mail.getString("oggetto"), mail.getString("testo"),
                         mail.getString("data"));
                 e.setId(mail.getInt("id"));
-                casella.add(e);
+
+                if(e.getId()>lastID){
+                    casella.add(e);
+                }
+
             }
             jsonReader.close();
         }
@@ -357,8 +367,8 @@ public class ServerController implements Initializable {
 
     private String dataPathCasella(String email) {
         String[] s=email.split("@");
-        return "C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
-        //return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
+        //return "C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
+        return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
 
     }
 

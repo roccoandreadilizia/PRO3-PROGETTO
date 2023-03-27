@@ -49,6 +49,10 @@ public class ClientController implements Initializable {
     public static String myUser = null;
     private ClientModel model;
 
+    int lastRefreshIndex = -1;
+    //utilizzato nel thread per il refresh automatico,
+    // utile per capire quali email inserire e quali no
+
 
 
     
@@ -57,10 +61,11 @@ public class ClientController implements Initializable {
 
         try {
             model.clientStart(nameUserLabel.getText());
+            refreshMail(false);
+
             //da fare ogni 10 sec
-            MiaClasse m= new MiaClasse(this);
+            MiaClasse m = new MiaClasse(this);
             m.start();
-            //refreshMail();
 
 
         } catch (RuntimeException e) {
@@ -83,27 +88,41 @@ public class ClientController implements Initializable {
         myUser = s.nextLine();
         nameUserLabel.setText(myUser);
 
+
+
     }
 
 
 
 
-    public void refreshMail(){
-
+    public void refreshMail(boolean stato){
+        //stato = false --> siamo in stato di inizializzazione
+        //stato = true --> siamo in fase di aggiornamento dovuto al thread
 
 
         try {
             List<Email> visualizza = model.askMail();
             for (Email e : visualizza) {
-
+                int temp = e.getId();
                 String mittente =e.getMittente();
                 String oggetto= e.getOggetto();
-                emailListView.getItems().add(oggetto+" ----- "+e.getData());
+                lastRefreshIndex = temp;
+                emailListView.getItems().add(mittente + ": " + oggetto +" ----- "+e.getData());
+
+
+                if(stato){
+                    model.startAlert("Hai ricevuto una nuova email!");
+                }
+
+
             }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+
 
     public void nuovaMail(ActionEvent actionEvent) throws IOException {
 
@@ -192,7 +211,9 @@ class MiaClasse extends Thread{
 
     public void run() {
         while(true){
-            c.refreshMail();
+
+
+            c.refreshMail(true);
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {

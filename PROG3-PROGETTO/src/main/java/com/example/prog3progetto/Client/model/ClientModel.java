@@ -24,7 +24,7 @@ public class ClientModel {
     private static List<Email> casella;
     public Utente utente;
 
-
+    public static int maxIdEmailLetta = -1;
 
     public Email currentEmail = null;
     public  int bottoneCliccato;
@@ -109,7 +109,8 @@ public class ClientModel {
                 socket = new Socket("127.0.0.1",4445);
             }
             outputStream = new ObjectOutputStream(socket.getOutputStream());//ciò che mando al server
-            Coppia c = new Coppia(2,utente);
+            Coppia p = new Coppia(utente,maxIdEmailLetta);
+            Coppia c = new Coppia(2,p);
             outputStream.writeObject(c);
 
 
