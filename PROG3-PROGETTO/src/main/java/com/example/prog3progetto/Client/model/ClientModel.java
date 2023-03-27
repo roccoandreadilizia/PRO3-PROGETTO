@@ -72,7 +72,7 @@ public class ClientModel {
     }
 
     public Boolean sendMail(Email e) throws IOException,ClassNotFoundException {
-        if(e.destinatari==null){
+        if(e.getDestinatari()==null){
             startAlert();
             return false;
         }
@@ -142,18 +142,34 @@ public class ClientModel {
     /** Chiedo al server di eliminare la email associata selezionata */
     public void deleteMail(Email email) throws IOException {
 
+
         try {
             Socket sendSocket = new Socket("127.0.0.1", 4445);
             outputStream = new ObjectOutputStream(sendSocket.getOutputStream()); //è ciò che mandiamo al server
 
 
-
-            Coppia c = new Coppia(utente.getEmail(),email.getId());
-            Coppia c2 = new Coppia(4,c);
+            Coppia c = new Coppia(utente.getEmail(), email.getId());
+            Coppia c2 = new Coppia(4, c);
             outputStream.writeObject(c2);
-            startAlert("email eliminata");
+
+            /*inputStream = new ObjectInputStream(socket.getInputStream());
+            obj = inputStream.readObject();*/
+
+            /*if (obj instanceof Boolean) {
+                Boolean esito = (Boolean) obj;
+                if (esito) {
+                    startAlert("Email eliminata con successo!");
+                    temp = true;
+                } else {
+                    startAlert("Email NON eliminata");
+                }
+            }*/
+
+            startAlert("Email eliminata con successo!");
             outputStream.flush();
             outputStream.close();
+
+            /*inputStream.close();*/
 
             sendSocket.close();
 
@@ -162,13 +178,10 @@ public class ClientModel {
             //ClientController.startAlert("Server Offline, prova a riconnetterti");
         } catch (SocketException e) {
             e.printStackTrace();
-        }  catch (EOFException e) {
+        } catch (EOFException e) {
             e.printStackTrace();
-        } finally {
-            //outputStream.flush();
-            //outputStream.close();
-
         }
+
 
     }
 

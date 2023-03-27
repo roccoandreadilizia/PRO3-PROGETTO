@@ -108,6 +108,7 @@ public class NuovaMailController implements Initializable {
             Boolean invio = modello.sendMail(new Email( modello.getEmail(), listaDestinatari() ,
                     oggettoField.getText(), textField.getText(), formatter.format(date).toString()));
             if(invio){
+                modello.startAlert("Email inviata con successo!");
                 ClientController.stage.close();
             }else{
                 modello.startAlert("Campo destinatari errati!");
@@ -118,7 +119,6 @@ public class NuovaMailController implements Initializable {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("ciaoNuovaFinestra");
     }
 
     public List<String> listaDestinatari(){
@@ -136,9 +136,9 @@ public class NuovaMailController implements Initializable {
 
     public static Boolean validateEmail(String s){
         if(s.matches(String.valueOf(Pattern.compile("[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$", Pattern.CASE_INSENSITIVE)))){
-            return true;
-        }else {
             return false;
+        }else {
+            return true;
         }
     }
 

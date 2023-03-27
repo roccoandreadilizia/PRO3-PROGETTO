@@ -198,13 +198,15 @@ public class ServerController implements Initializable {
                                 String indirizzo= (String) UserANDId.getOggetto1();
                                 Integer idMail= (Integer) UserANDId.getOggetto2();
 
-                                eliminaMail(indirizzo, idMail);
+                                Boolean esito = eliminaMail(indirizzo, idMail);
 
-                                printOnLog("Mail ID: "+ idMail + " eliminata da: " + indirizzo);
-                                /*Boolean message = true;
-                                outputStream.writeObject(message);*/
+                                if(esito){
+                                    printOnLog("Mail ID: "+ idMail + " eliminata da: " + indirizzo);
+                                }else{
+                                    printOnLog("Eliminazione email: TENTATIVO FALLITO");
+                                }
+                                /*outputStream.writeObject(esito);*/
 
-                                outputStream.flush();//mando il risultato in outputStream sul socket
                                 break;
 
                             default: //chiudo l'InputStream e l'OutputStream del socket
@@ -254,17 +256,17 @@ public class ServerController implements Initializable {
 
 
 
-    private void eliminaMail(String email, int id) throws IOException {
+    private Boolean eliminaMail(String email, int id) throws IOException {
 
         ArrayList<Email> casella = leggiCasella(email);
         for (Email e : casella) {
             if (e.getId() == id) {
                 casella.remove(e);
                 scriviCasella(email, casella);
-                return;
+                return true;
             }
         }
-
+        return false;
     }
 
     private ArrayList<Email> leggiCasella(String email) throws IOException {
@@ -355,8 +357,8 @@ public class ServerController implements Initializable {
 
     private String dataPathCasella(String email) {
         String[] s=email.split("@");
-        return "C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
-        //return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
+        //return "C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
+        return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
 
     }
 

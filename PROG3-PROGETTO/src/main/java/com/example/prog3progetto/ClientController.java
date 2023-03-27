@@ -102,20 +102,17 @@ public class ClientController implements Initializable {
     }
 
     public void nuovaMail(ActionEvent actionEvent) throws IOException {
-        model.setBottoneCliccato(0);
-        if(model.getCurrentEmail()!=null){
+
             creaFinestra();
-        }
+
     }
 
     public void deleteMail(ActionEvent actionEvent) throws IOException{
         model.setBottoneCliccato(5);
         if(model.getCurrentEmail()!=null){
             model.deleteMail(model.getCurrentEmail());
-
-            //prima di fare refresh mail devi cancellare quelle prima
+            emailListView.getItems().remove(listViewIndex);
         }
-        refreshMail();
     }
 
     public void rispondiAll(ActionEvent actionEvent) throws IOException{
