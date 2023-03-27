@@ -91,7 +91,7 @@ public class NuovaMailController implements Initializable {
             String currSplit = split[i].replace("\"", "");//serve per eliminare \"
             if(currSplit.equals(modello.getEmail())){
             }else{
-                tot += "," + currSplit ;
+                tot += ";" + currSplit ;
             }
         }
         return modello.getCurrentEmail().getMittente() + tot;

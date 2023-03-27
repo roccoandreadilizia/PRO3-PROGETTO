@@ -57,7 +57,10 @@ public class ClientController implements Initializable {
 
         try {
             model.clientStart(nameUserLabel.getText());
-            refreshMail();
+            //da fare ogni 10 sec
+            MiaClasse m= new MiaClasse(this);
+            m.start();
+            //refreshMail();
 
 
         } catch (RuntimeException e) {
@@ -92,6 +95,7 @@ public class ClientController implements Initializable {
         try {
             List<Email> visualizza = model.askMail();
             for (Email e : visualizza) {
+
                 String mittente =e.getMittente();
                 String oggetto= e.getOggetto();
                 emailListView.getItems().add(oggetto+" ----- "+e.getData());
@@ -104,7 +108,6 @@ public class ClientController implements Initializable {
     public void nuovaMail(ActionEvent actionEvent) throws IOException {
 
             creaFinestra();
-
     }
 
     public void deleteMail(ActionEvent actionEvent) throws IOException{
@@ -178,4 +181,24 @@ public class ClientController implements Initializable {
     }
 
 
+}
+
+class MiaClasse extends Thread{
+
+    ClientController c;
+    public MiaClasse(ClientController c) {
+        this.c=c;
+    }
+
+    public void run() {
+        while(true){
+            c.refreshMail();
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
 }

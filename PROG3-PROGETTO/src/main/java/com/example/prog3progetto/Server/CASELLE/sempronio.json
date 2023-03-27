@@ -1,1 +1,1 @@
-[{"id":0,"mittente":"caio@gmail.com","destinatari":["tizio@gmail.com","sempronio@gmail.com"],"oggetto":"Prova invio multiplo","testo":"AAA","data":"27/03/2023 15:31:39"}]
+[{"id":0,"mittente":"caio@gmail.com","destinatari":["tizio@gmail.com","sempronio@gmail.com"],"oggetto":"Prova invio multiplo","testo":"AAA","data":"27/03/2023 15:31:39"},{"id":1,"mittente":"tizio@gmail.com","destinatari":["caio@gmail.com","sempronio@gmail.com"],"oggetto":"ekfnejfhjfh","testo":"waekjfhrjhlawlwaew","data":"27/03/2023 16:29:06"}]
