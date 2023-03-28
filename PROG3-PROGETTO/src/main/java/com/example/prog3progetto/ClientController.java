@@ -3,15 +3,13 @@ package com.example.prog3progetto;
 import com.example.prog3progetto.Client.controller.NuovaMailController;
 import com.example.prog3progetto.Client.model.*;
 import com.example.prog3progetto.Utils.Email;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -47,25 +45,39 @@ public class ClientController implements Initializable {
     public Email currentEmail;
 
     public static String myUser = null;
+
+    public static Boolean mutuaEsclusione = false;
+
+    public ClientModel getModel() {
+        return model;
+    }
+
     private ClientModel model;
-
-    int lastRefreshIndex = -1;
-    //utilizzato nel thread per il refresh automatico,
-    // utile per capire quali email inserire e quali no
-
-
-
     
+
+
+    /*
+    * Metodo per inzializzare il Modello che 
+    * farà riferimento a questa istanza di clientController!
+    * 
+    * Si occuperà della prima fase di "Accesso"
+    * e del riempimento della listView
+    * 
+    * */
     public void initModel(ClientModel model){
         this.model = model;
 
         try {
             model.clientStart(nameUserLabel.getText());
-            refreshMail(false);
+            richiediMail();
 
-            //da fare ogni 10 sec
-            MiaClasse m = new MiaClasse(this);
-            m.start();
+            /*
+            * Thread per la ricarica automatica della listView.
+            * 
+            * Verrà eseguito ogni 10 secondi
+            * */
+            RefreshThread t = new RefreshThread(this);
+            t.start();       
 
 
         } catch (RuntimeException e) {
@@ -86,19 +98,14 @@ public class ClientController implements Initializable {
         System.out.println("Inserisci email utente:");
         Scanner s = new Scanner(System.in);
         myUser = s.nextLine();
-        nameUserLabel.setText(myUser);
-
-
+        nameUserLabel.setText("Ciao " + myUser);
 
     }
 
 
 
 
-    public void refreshMail(boolean stato){
-        //stato = false --> siamo in stato di inizializzazione
-        //stato = true --> siamo in fase di aggiornamento dovuto al thread
-
+    public void richiediMail(){
 
         try {
             List<Email> visualizza = model.askMail();
@@ -106,15 +113,27 @@ public class ClientController implements Initializable {
                 int temp = e.getId();
                 String mittente =e.getMittente();
                 String oggetto= e.getOggetto();
-                lastRefreshIndex = temp;
+                emailListView.getItems().add(mittente + ": " + oggetto +" ----- "+e.getData());
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void refreshEmail(){
+        try {
+            List<Email> visualizza = model.askMail();
+            for (Email e : visualizza) {
+                int temp = e.getId();
+                String mittente =e.getMittente();
+                String oggetto= e.getOggetto();
+
                 emailListView.getItems().add(mittente + ": " + oggetto +" ----- "+e.getData());
 
-
-                if(stato){
-                    model.startAlert("Hai ricevuto una nuova email!");
-                }
-
-
+            }
+            if(visualizza.size()!=0){
+                model.startInfoAlert("Hai ricevuto " + visualizza.size() + " nuove email");
             }
 
         } catch (IOException e) {
@@ -123,17 +142,17 @@ public class ClientController implements Initializable {
     }
 
 
-
     public void nuovaMail(ActionEvent actionEvent) throws IOException {
-
             creaFinestra();
     }
 
     public void deleteMail(ActionEvent actionEvent) throws IOException{
         model.setBottoneCliccato(5);
         if(model.getCurrentEmail()!=null){
-            model.deleteMail(model.getCurrentEmail());
-            emailListView.getItems().remove(listViewIndex);
+            if(model.deleteMail(model.getCurrentEmail())){
+                emailListView.getItems().remove(listViewIndex);
+            }
+
         }
     }
 
@@ -167,19 +186,18 @@ public class ClientController implements Initializable {
 
         Scene scene = new Scene(root, 600, 400);
         stage = new Stage();
-        stage.setTitle("Hello!");
+        stage.setTitle("Nuova Email!");
         stage.setScene(scene);
         stage.show();
     }
 
 
-
-
+    
     public void selectEmailFromView(MouseEvent args){
         listViewIndex = emailListView.getSelectionModel().getSelectedIndex();
-        //seleziona l'index della mail nella list view
+        //seleziona l'indice della mail nella list view
         currentEmail = model.getEmailFromList(listViewIndex);
-        //prende la mail corrispondente all'hash index
+        
 
         if (currentEmail != null) {
             model.setCurrentEmail(currentEmail);
@@ -200,20 +218,30 @@ public class ClientController implements Initializable {
     }
 
 
+
+
+
 }
 
-class MiaClasse extends Thread{
+class RefreshThread extends Thread{
 
-    ClientController c;
-    public MiaClasse(ClientController c) {
-        this.c=c;
+    ClientController clientController;
+    public RefreshThread(ClientController clientController) {
+        this.clientController=clientController;
     }
+
+
 
     public void run() {
         while(true){
 
+            System.out.println("pre refresh");
+            if(clientController.mutuaEsclusione == false){
 
-            c.refreshMail(true);
+                clientController.refreshEmail();
+
+            }
+            System.out.println("refresh");
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {

@@ -108,10 +108,10 @@ public class NuovaMailController implements Initializable {
             Boolean invio = modello.sendMail(new Email( modello.getEmail(), listaDestinatari() ,
                     oggettoField.getText(), textField.getText(), formatter.format(date).toString()));
             if(invio){
-                modello.startAlert("Email inviata con successo!");
+                modello.startInfoAlert("Email inviata con successo!");
                 ClientController.stage.close();
             }else{
-                modello.startAlert("Campo destinatari errati!");
+                modello.startNegativeAlert("Campo destinatari errati!");
             }
 
         } catch (IOException e) {

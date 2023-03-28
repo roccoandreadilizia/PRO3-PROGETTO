@@ -20,7 +20,7 @@ public class ClientView extends Application {
         clientController.initModel(model);
 
         Scene scene = new Scene(root, 900, 500);
-        stage.setTitle("Hello!");
+        stage.setTitle("DN&ND Mail!");
         stage.setScene(scene);
         stage.show();
     }

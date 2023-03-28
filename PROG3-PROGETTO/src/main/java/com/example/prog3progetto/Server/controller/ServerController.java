@@ -47,12 +47,13 @@ public class ServerController implements Initializable {
             clients = new ArrayList<>();
             System.out.println("Creazione di un socket all'indirizzo: " + s.getLocalSocketAddress());
             int i = 1;
+            ExecutorService exec= Executors.newFixedThreadPool(2);
             while (true) {//creo un loop infinito per gestire i client che fanno richiesta di connessione al socket
 
                 int finalI = i;//contatore dei thread
                 Socket incoming = s.accept();//questo while non va in loop infinito poichè si ferma subito in s.accept(), e aspetta che un client faccia richiesta al server
 
-                /*ExecutorService exec= Executors.newFixedThreadPool(2);
+
                 exec.execute(new Runnable() {
                     @Override
                     public void run() {
@@ -66,8 +67,8 @@ public class ServerController implements Initializable {
                         }
                     }
                 });
-                i++;*/
-                new Thread() {
+                i++;
+                /*new Thread() {
                     @Override
                     public void run() {
 
@@ -85,7 +86,7 @@ public class ServerController implements Initializable {
                          *
                          *  Fonte: https://www.youtube.com/watch?v=IOb9jJkKCZk
                          * */
-                        Platform.runLater(() -> {
+                     /*   Platform.runLater(() -> {
                             try {
                                 clients.add(new CoppiaUtenteSocket(incoming, null));//aggiungo un clients (socket-user) -> user è nullo poichè devo ancora fare il login
                                 GestoreThread(incoming, finalI);
@@ -98,7 +99,7 @@ public class ServerController implements Initializable {
                     }
                 }.start();
 
-                i++;
+                i++;*/
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -211,13 +212,14 @@ public class ServerController implements Initializable {
                                 }else{
                                     printOnLog("Eliminazione email: TENTATIVO FALLITO");
                                 }
-                                /*outputStream.writeObject(esito);*/
+                                outputStream.writeObject(new Coppia("esito",esito));
 
                                 break;
 
                             default: //chiudo l'InputStream e l'OutputStream del socket
                                 outputStream.close();
                                 inputStram.close();
+                                incoming.close();
                         }
                     }
                 }

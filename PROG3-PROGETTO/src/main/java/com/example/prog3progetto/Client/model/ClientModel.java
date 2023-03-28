@@ -1,8 +1,10 @@
 package com.example.prog3progetto.Client.model;
 
+import com.example.prog3progetto.ClientController;
 import com.example.prog3progetto.Utils.Coppia;
 import com.example.prog3progetto.Utils.Email;
 import com.example.prog3progetto.Utils.Utente;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
 import java.io.EOFException;
@@ -12,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -20,8 +23,10 @@ public class ClientModel {
     public static Socket socket;
     private static ObjectOutputStream outputStream = null;
     private static ObjectInputStream inputStream = null;
+
     public static Object obj;
     private static List<Email> casella;
+
     public Utente utente;
 
     public static int maxIdEmailLetta = -1;
@@ -29,18 +34,10 @@ public class ClientModel {
     public Email currentEmail = null;
     public  int bottoneCliccato;
 
-    //lista delle mail
-    //porta e ip
-    //allert dal server
-    //inviare/inoltrare/rispondere a una mail
-    //eliminare una mail
 
 
     /*Metodo usato in fase d'inizializzazzione per effettuare una sorta di login da tastiera*/
     public void clientStart(String email) throws IOException{
-
-
-
         try{
             socket = new Socket("127.0.0.1",4445);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -52,7 +49,7 @@ public class ClientModel {
 
             if(obj instanceof Utente){
                 utente = (Utente) obj;
-                System.out.println("Accesso effettuato");
+                startInfoAlert("Benvenuto " + utente.getHeaderEmail());
             }else{
                 System.out.println("Errore accesso");
             }
@@ -60,7 +57,7 @@ public class ClientModel {
             inputStream.close();
             socket.close();
         } catch (ConnectException ce) {
-            startAlert("Server Offline, prova a riconnetterti");
+            startNegativeAlert("Server Offline, prova a riconnetterti");
         } catch (SocketException se) {
             se.printStackTrace();
         } catch (IOException e) {
@@ -72,37 +69,52 @@ public class ClientModel {
     }
 
     public Boolean sendMail(Email e) throws IOException,ClassNotFoundException {
+
         if(e.getDestinatari()==null){
-            startAlert();
+            startNegativeAlert("Nessun destinatario inserito!");
             return false;
         }
+
         boolean sent = false;
         Socket sendSocket = new Socket("127.0.0.1", 4445);
-        outputStream = new ObjectOutputStream(sendSocket.getOutputStream()); //è ciò che mandiamo al server
 
-        Coppia c = new Coppia(3,e);
+        try{
+            ClientController.mutuaEsclusione = true;
+            outputStream = new ObjectOutputStream(sendSocket.getOutputStream()); //è ciò che mandiamo al server
 
-        outputStream.writeObject(c);
-        inputStream = new ObjectInputStream(sendSocket.getInputStream());
+            Coppia c = new Coppia(3,e);
 
-        obj=inputStream.readObject();
+            outputStream.writeObject(c);
+            inputStream = new ObjectInputStream(sendSocket.getInputStream());
 
-        if(obj instanceof Boolean) {
-            Boolean m = (Boolean) obj;
-            sent = m;
+            obj=inputStream.readObject();
+
+            if(obj instanceof Boolean) {
+                Boolean m = (Boolean) obj;
+                sent = m;
+            }
+        }catch (ConnectException ex) {
+            startNegativeAlert("Server Offline, prova a riconnetterti!");
+        } catch (SocketException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        } finally {
+            ClientController.mutuaEsclusione = false;//libero la mutua esclusione
+            outputStream.flush();
+            outputStream.close();
+
         }
-
-        outputStream.flush();
-        outputStream.close();
-
         sendSocket.close();
         return sent;
 
 
     }
 
-    /** Chiedo al server la lista delle mail associate all'user */
+    /** Chiedo al server la lista delle mail associate all'utente */
     public List<Email> askMail() throws IOException {
+
+        List<Email> casellaRefresh = null;
 
         try {
             if(socket==null||socket.isClosed()){
@@ -114,16 +126,37 @@ public class ClientModel {
             outputStream.writeObject(c);
 
 
+
             inputStream = new ObjectInputStream(socket.getInputStream());
 
             System.out.println("Collegato");
 
 
             obj=inputStream.readObject();
-            casella = (List<Email>) obj;
-            System.out.println("ricevuto roba");
 
-
+            if(casella == null){
+                casella = (List<Email>) obj;
+                for (Email e: casella){
+                    if(e.getId() > maxIdEmailLetta){
+                        maxIdEmailLetta = e.getId();
+                    }
+                }
+            }else{
+                casellaRefresh = (List<Email>) obj;
+                for (Email e: casellaRefresh){
+                    if(e.getId() > maxIdEmailLetta){
+                        maxIdEmailLetta = e.getId();
+                    }
+                    /*
+                    * Incremento la lista casella per poterla utilizzare
+                    * durante la selezione di una email da listView
+                    *
+                    * Se così non facessi creerei inconsistenza tra
+                    * l'indice della listView e la lunghezza della casella
+                    * */
+                    casella.add(e);
+                }
+            }
 
         } catch (ConnectException ce) {
             //ClientController.startAlert("Server Offline, prova a riconnetterti");
@@ -134,18 +167,27 @@ public class ClientModel {
         } catch (EOFException e) {
             e.printStackTrace();
         } finally {
-            //outputStream.flush();
-            //outputStream.close();
+            outputStream.flush();
+            inputStream.close();
+            outputStream.close();
         }
-        return casella;
+        if(casellaRefresh != null){
+            return casellaRefresh;
+        }else{
+            return casella;
+        }
+
     }
 
     /** Chiedo al server di eliminare la email associata selezionata */
-    public void deleteMail(Email email) throws IOException {
+    public boolean deleteMail(Email email) throws IOException {
 
 
+        Socket sendSocket = null;
+        Boolean esito = false;
         try {
-            Socket sendSocket = new Socket("127.0.0.1", 4445);
+            sendSocket = new Socket("127.0.0.1", 4445);
+            ClientController.mutuaEsclusione = true;
             outputStream = new ObjectOutputStream(sendSocket.getOutputStream()); //è ciò che mandiamo al server
 
 
@@ -153,26 +195,19 @@ public class ClientModel {
             Coppia c2 = new Coppia(4, c);
             outputStream.writeObject(c2);
 
-            /*inputStream = new ObjectInputStream(socket.getInputStream());
-            obj = inputStream.readObject();*/
+            inputStream = new ObjectInputStream(sendSocket.getInputStream());
+            obj = inputStream.readObject();
 
-            /*if (obj instanceof Boolean) {
-                Boolean esito = (Boolean) obj;
-                if (esito) {
-                    startAlert("Email eliminata con successo!");
-                    temp = true;
-                } else {
-                    startAlert("Email NON eliminata");
+            if(obj instanceof Coppia){
+                Coppia coppiaEsito = (Coppia) obj;
+                esito = (Boolean) coppiaEsito.getOggetto2();
+
+                if(esito){
+                    startInfoAlert("Email eliminata!");
+                }else{
+                    startInfoAlert("Email NON eliminata!");
                 }
-            }*/
-
-            startAlert("Email eliminata con successo!");
-            outputStream.flush();
-            outputStream.close();
-
-            /*inputStream.close();*/
-
-            sendSocket.close();
+            }
 
 
         } catch (ConnectException ce) {
@@ -181,27 +216,46 @@ public class ClientModel {
             e.printStackTrace();
         } catch (EOFException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } finally {
+            ClientController.mutuaEsclusione = true;
+            outputStream.flush();
+            inputStream.close();
+            outputStream.close();
+
         }
-
-
+        sendSocket.close();
+        return esito;
     }
 
 
-    public void startAlert() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Errore!");
-        alert.setHeaderText("Destinatario NON trovato!");
-        alert.show();
+    public void startNegativeAlert(String s) {
+        Platform.runLater(new Runnable() {
+            @Override public void run() {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Errore!");
+                alert.setHeaderText(s);
+                alert.showAndWait();
+            }}
+        );
     }
 
-    public void startAlert(String s) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setHeaderText(s);
-        alert.show();
+    public void startInfoAlert(String s) {
+        Platform.runLater(new Runnable() {
+            @Override public void run() {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText(s);
+                alert.showAndWait();
+            }}
+        );
     }
 
     public Email getEmailFromList(int listViewIndex) {
-        return casella.get(listViewIndex);
+
+        try{
+            return casella.get(listViewIndex);
+        }catch(IndexOutOfBoundsException e){return null;}
     }
 
     public String getEmail(){
