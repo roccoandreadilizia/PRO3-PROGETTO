@@ -24,7 +24,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ServerController implements Initializable {
 
-    public static ArrayList<CoppiaUtenteSocket> clients;
 
     public Utente utente = null;
     @FXML
@@ -46,13 +45,12 @@ public class ServerController implements Initializable {
     public void socketThreadStart() {
         try {
             ServerSocket s = new ServerSocket(4445);//la porta l'ho scelta a caso, in modo che non andasse ad interferire con altri processi (ad esempio la porta 8080)
-            clients = new ArrayList<>();
             System.out.println("Creazione di un socket all'indirizzo: " + s.getLocalSocketAddress());
-            int i = 1;
-            ExecutorService exec= Executors.newFixedThreadPool(2);
+
+            ExecutorService exec= Executors.newFixedThreadPool(3);
             while (true) {//creo un loop infinito per gestire i client che fanno richiesta di connessione al socket
 
-                int finalI = i;//contatore dei thread
+
                 Socket incoming = s.accept();//questo while non va in loop infinito poichè si ferma subito in s.accept(), e aspetta che un client faccia richiesta al server
 
 
@@ -60,8 +58,7 @@ public class ServerController implements Initializable {
                     @Override
                     public void run() {
                         try {
-                            clients.add(new CoppiaUtenteSocket(incoming, null));//aggiungo un clients (socket-user) -> user è nullo poichè devo ancora fare il login
-                            GestoreThread(incoming, finalI);
+                            GestoreThread(incoming);
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (ClassNotFoundException e) {
@@ -69,7 +66,6 @@ public class ServerController implements Initializable {
                         }
                     }
                 });
-                i++;
 
             }
         } catch (IOException e) {
@@ -79,7 +75,7 @@ public class ServerController implements Initializable {
 
 
 
-    public void GestoreThread(Socket incoming, int indice)throws IOException, ClassNotFoundException{
+    public void GestoreThread(Socket incoming)throws IOException, ClassNotFoundException{
 
         ObjectInputStream inputStram = new ObjectInputStream(incoming.getInputStream()); //input del socket
         ObjectOutputStream outputStream = new ObjectOutputStream(incoming.getOutputStream()); //output del socket
@@ -98,17 +94,12 @@ public class ServerController implements Initializable {
 
                                 String user = (String) c.getOggetto2();
 
-                                //setto la coppia username-socket (prima username era null)
-                                ServerController.clients.set(indice - 1,
-                                        new CoppiaUtenteSocket(ServerController.clients.get(indice - 1).socket, user));
-
                                 printOnLog("Login by " + user);
                                 outputStream.writeObject(new Utente(user));//Scrivo nell'output del socket
                                 break;
 
 
                             case 2:
-                                //List<Email> newMail = FileQuery.readMailJSON();
                                 Coppia p2 = (Coppia) c.getOggetto2();
                                 Utente utet = (Utente) p2.getOggetto1();
                                 List<Email> newMail = leggiCasella((String) utet.getEmail(), (Integer) p2.getOggetto2());
