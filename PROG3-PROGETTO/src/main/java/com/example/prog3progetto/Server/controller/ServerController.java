@@ -132,6 +132,7 @@ public class ServerController implements Initializable {
 
                                 if(check) {
                                     List<Email> emails = null;
+                                    printOnLog(sending.getMittente() + " Ha inviato una nuova email");//messaggio sul terminale del server
 
                                     for (String u : dests) {//per ogni user trovato nell'elenco dei destinatari
                                         emails = leggiCasella(u,-1);
@@ -143,10 +144,9 @@ public class ServerController implements Initializable {
                                         emails.add(sending);//aggiungo la nuova email
 
                                         scriviCasella(u, emails);//scrivo il nuovo elenco di user con la nuova mail aggiunta
-
-                                        printOnLog(sending.getMittente() + " Ha inviato una nuova email");//messaggio sul terminale del server
+                                        printOnLog(u + " Ha ricevuto una nuova email");
                                         for (String s : dests) {
-                                            printOnLog(s + " Ha ricevuto una nuova email");
+
                                             Boolean message = true;
                                             outputStream.writeObject(message);//Scrivo nell'output del socket
                                         }
