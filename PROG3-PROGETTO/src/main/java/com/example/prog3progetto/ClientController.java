@@ -68,7 +68,7 @@ public class ClientController implements Initializable {
         this.model = model;
 
         try {
-            model.clientStart(nameUserLabel.getText());
+            model.clientStart(myUser);
             richiediMail();
 
             /*

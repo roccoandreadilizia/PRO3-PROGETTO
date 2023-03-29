@@ -30,16 +30,12 @@ public class ServerController implements Initializable {
 
 
 
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         new Thread(() -> socketThreadStart()).start();
     }
 
-    /**
-     * Creazione di un nuovo Server socket  e utilizzo i thread
-     * per permettere a più client di connettersi contemporaneamente
-     * */
+
 
     public void socketThreadStart() {
         try {
@@ -68,38 +64,7 @@ public class ServerController implements Initializable {
                     }
                 });
                 i++;
-                /*new Thread() {
-                    @Override
-                    public void run() {
 
-                        /**
-                         * Quando un thread aggiorna la UI (User Interface) tale update deve essere eseguito nel main thread
-                         * (che esegue il metodo principale del programma e aggiorna gli elementi dell'interfaccia utente)
-                         * per questo motivo ho usato il metodo Platform.runLater(() -> {}) per poter modificare la scena da ogni thread
-                         *
-                         * RunLater viene usato come se fosse un sistema di coda, quindi metterà il thread in coda e lo eseguirà non appena
-                         * il main thread potrà
-                         * Questa tecnica è particolarmente usata nelle applicazioni di JavaFX poichè l'applicazione è il main Thread
-                         *
-                         * Esso significa che verrà eseguito ad un tempo indefinito nel futuro, di solito esso viene eseguito immediatamente
-                         * a meno che il main thread non sia occupato, in questo caso il thread aspetterà il suo turno
-                         *
-                         *  Fonte: https://www.youtube.com/watch?v=IOb9jJkKCZk
-                         * */
-                     /*   Platform.runLater(() -> {
-                            try {
-                                clients.add(new CoppiaUtenteSocket(incoming, null));//aggiungo un clients (socket-user) -> user è nullo poichè devo ancora fare il login
-                                GestoreThread(incoming, finalI);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (ClassNotFoundException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                    }
-                }.start();
-
-                i++;*/
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -107,16 +72,7 @@ public class ServerController implements Initializable {
     }
 
 
-    /**
-     ThreadHandler serve per leggere in modo ciclico l'inputStream ed eseguire delle azioni
-     in base a cosa hanno inviato i Client nel Server
 
-     Le operazioni sono così gestite:
-     1)Client Start
-     2)Richiesta di mail
-     3)Richiesta di invio di una mail
-     4)Richiesta di eliminare una mail
-     */
     public void GestoreThread(Socket incoming, int indice)throws IOException, ClassNotFoundException{
 
         ObjectInputStream inputStram = new ObjectInputStream(incoming.getInputStream()); //input del socket
@@ -136,7 +92,7 @@ public class ServerController implements Initializable {
                                 Utente user = new Utente((String) c.getOggetto2());
                                 utente = user;
 
-                                //controllo email anche da client
+                                //
 
 
                                 //setto la coppia username-socket (prima username era null)
@@ -234,33 +190,25 @@ public class ServerController implements Initializable {
         } else System.out.println("Il Socket è chiuso");
         }
 
-        /*try{
-            ServerSocket s= new ServerSocket(4445);
+    private void addUser(String email) throws IOException {
+        File file = new File(dataPathCasella("user"));
+        InputStream fis = new FileInputStream(file);
+        JsonReader jsonReader=Json.createReader(fis);
+        JsonArray arrayPartenza= jsonReader.readArray();
+        JsonObject PrimoElement= arrayPartenza.getJsonObject(0);
+        JsonArray emailCampo= PrimoElement.getJsonArray("email");
+        ArrayList<String> utenti=new ArrayList<>();
 
-            while(true) {
+        for(int i=0; i<emailCampo.size(); i++){
+            String address=emailCampo.getString(i);
+            utenti.add(address);
+        }
+        utenti.add(email);
+        fis.close();
+        jsonReader.close();
 
-                Socket socket = s.accept();
-                System.out.println("Accettato socket " + socket);
-                ObjectInputStream inStream = new ObjectInputStream(socket.getInputStream());//prendo l'input dal socket (la mail e la action)
-                ObjectOutputStream outStream = new ObjectOutputStream(socket.getOutputStream());//prendo l'output del socket
+    }
 
-                try {
-
-
-
-                    String[] user = "tizio@gmail.com".split("@");
-                    //List<Email> newMail = FileQuery.readMailJSON();
-                    List<Email> newMail = leggiCasella(user[0]);
-                    outStream.writeObject(newMail);
-                } finally {
-                    socket.close();
-                    outStream.close();
-                    inStream.close();
-                }
-            }
-        }catch(IOException e){
-            e.printStackTrace();
-        }*/
 
 
 
@@ -375,8 +323,6 @@ public class ServerController implements Initializable {
     }
 
 
-
-    //nella initialize crea un thread pool, in cui esegui il server socket/sochet accept while e sticazzi
 
 
 }
