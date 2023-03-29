@@ -1,6 +1,7 @@
 package com.example.prog3progetto.Client.controller;
 
 import com.example.prog3progetto.Client.model.ClientModel;
+import com.example.prog3progetto.Client.model.MYSERVERException;
 import com.example.prog3progetto.ClientController;
 import com.example.prog3progetto.Utils.Email;
 import javafx.beans.property.StringProperty;
@@ -118,6 +119,8 @@ public class NuovaMailController implements Initializable {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
+        } catch (MYSERVERException e) {
+            ClientController.stage.close();
         }
     }
 

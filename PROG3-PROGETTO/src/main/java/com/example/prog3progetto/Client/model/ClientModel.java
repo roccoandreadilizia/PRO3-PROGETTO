@@ -1,6 +1,7 @@
 package com.example.prog3progetto.Client.model;
 
 import com.example.prog3progetto.ClientController;
+import com.example.prog3progetto.ClientView;
 import com.example.prog3progetto.Utils.Coppia;
 import com.example.prog3progetto.Utils.Email;
 import com.example.prog3progetto.Utils.Utente;
@@ -37,7 +38,7 @@ public class ClientModel {
 
 
     /*Metodo usato in fase d'inizializzazzione per effettuare una sorta di login da tastiera*/
-    public void clientStart(String email) throws IOException{
+    public void clientStart(String email) throws IOException, MYSERVERException {
         try{
             socket = new Socket("127.0.0.1",4445);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -58,6 +59,9 @@ public class ClientModel {
             socket.close();
         } catch (ConnectException ce) {
             startNegativeAlert("Server Offline, prova a riconnetterti");
+            maxIdEmailLetta = -1;
+            casella = null;
+            throw new MYSERVERException("Server OFFLINE","Server off");
         } catch (SocketException se) {
             se.printStackTrace();
         } catch (IOException e) {
@@ -68,7 +72,7 @@ public class ClientModel {
 
     }
 
-    public Boolean sendMail(Email e) throws IOException,ClassNotFoundException {
+    public Boolean sendMail(Email e) throws IOException, ClassNotFoundException, MYSERVERException {
 
         if(e.getDestinatari()==null){
             startNegativeAlert("Nessun destinatario inserito!");
@@ -95,6 +99,7 @@ public class ClientModel {
             }
         }catch (ConnectException ex) {
             startNegativeAlert("Server Offline, prova a riconnetterti!");
+            throw new MYSERVERException("Server OFFLINE","Server off");
         } catch (SocketException ex) {
             ex.printStackTrace();
         } catch (ClassNotFoundException ex) {
@@ -112,7 +117,7 @@ public class ClientModel {
     }
 
     /** Chiedo al server la lista delle mail associate all'utente */
-    public List<Email> askMail() throws IOException {
+    public List<Email> askMail() throws IOException, MYSERVERException {
 
         List<Email> casellaRefresh = null;
 
@@ -160,6 +165,7 @@ public class ClientModel {
 
         } catch (ConnectException ce) {
             startNegativeAlert("Server Offline, prova a riconnetterti");
+            throw new MYSERVERException("Server OFFLINE","Server off");
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -180,7 +186,7 @@ public class ClientModel {
     }
 
     /** Chiedo al server di eliminare la email associata selezionata */
-    public boolean deleteMail(Email email) throws IOException {
+    public boolean deleteMail(Email email) throws IOException, MYSERVERException {
 
 
         Socket sendSocket = null;
@@ -211,7 +217,8 @@ public class ClientModel {
 
 
         } catch (ConnectException ce) {
-            //ClientController.startAlert("Server Offline, prova a riconnetterti");
+            startNegativeAlert("Server Offline, prova a riconnetterti");
+            throw new MYSERVERException("Server OFFLINE","Server off");
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (EOFException e) {
@@ -219,7 +226,7 @@ public class ClientModel {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } finally {
-            ClientController.mutuaEsclusione = true;
+            ClientController.mutuaEsclusione = false;
             outputStream.flush();
             inputStream.close();
             outputStream.close();
@@ -278,3 +285,4 @@ public class ClientModel {
         this.bottoneCliccato = bottoneCliccato;
     }
 }
+

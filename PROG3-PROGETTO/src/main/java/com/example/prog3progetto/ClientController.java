@@ -66,24 +66,36 @@ public class ClientController implements Initializable {
     * */
     public void initModel(ClientModel model){
         this.model = model;
-
+        RefreshThread t = new RefreshThread(this);
         try {
             model.clientStart(myUser);
             richiediMail();
+
 
             /*
             * Thread per la ricarica automatica della listView.
             * 
             * Verrà eseguito ogni 10 secondi
             * */
-            RefreshThread t = new RefreshThread(this);
-            t.start();       
+
+
+            t.start();
+
 
 
         } catch (RuntimeException e) {
             e.printStackTrace();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (MYSERVERException e) {
+            emailListView.getItems().clear();
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+            t.stops();
+            initModel(model);
         }
 
     }
@@ -118,6 +130,8 @@ public class ClientController implements Initializable {
 
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (MYSERVERException e) {
+            initModel(model);
         }
     }
 
@@ -138,6 +152,8 @@ public class ClientController implements Initializable {
 
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (MYSERVERException e) {
+            initModel(model);
         }
     }
 
@@ -146,11 +162,15 @@ public class ClientController implements Initializable {
             creaFinestra();
     }
 
-    public void deleteMail(ActionEvent actionEvent) throws IOException{
+    public void deleteMail(ActionEvent actionEvent) throws IOException  {
         model.setBottoneCliccato(5);
         if(model.getCurrentEmail()!=null){
-            if(model.deleteMail(model.getCurrentEmail())){
-                emailListView.getItems().remove(listViewIndex);
+            try{
+                if(model.deleteMail(model.getCurrentEmail())){
+                    emailListView.getItems().remove(listViewIndex);
+                }
+            }catch (MYSERVERException e){
+                initModel(model);
             }
 
         }
@@ -230,10 +250,11 @@ class RefreshThread extends Thread{
         this.clientController=clientController;
     }
 
+    private boolean exit=false;
 
 
     public void run() {
-        while(true){
+        while(!exit){
 
             System.out.println("pre refresh");
             if(clientController.mutuaEsclusione == false){
@@ -249,5 +270,10 @@ class RefreshThread extends Thread{
             }
         }
 
+    }
+
+    public void stops()
+    {
+        exit = true;
     }
 }
