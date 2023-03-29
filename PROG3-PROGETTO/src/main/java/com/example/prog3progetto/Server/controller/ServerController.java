@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 public class ServerController implements Initializable {
@@ -26,6 +28,9 @@ public class ServerController implements Initializable {
     public Utente utente = null;
     @FXML
     private ListView listLog;
+
+    public static final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
 
 
 
@@ -227,66 +232,76 @@ public class ServerController implements Initializable {
 
     private ArrayList<Email> leggiCasella(String email,int lastID) throws IOException {
         ArrayList<Email> casella= new ArrayList<>();
-
         File file = new File(dataPathCasella(email));
-        int ll= (int) file.length();
-        if(ll!=0){
-            InputStream fis = new FileInputStream(file);
-            JsonReader jsonReader=Json.createReader(fis);
-            JsonArray jsonArray= jsonReader.readArray();
 
-            fis.close();
+        readWriteLock.readLock().lock();
+        try {
+            int ll = (int) file.length();
+            if (ll != 0) {
+                InputStream fis = new FileInputStream(file);
+                JsonReader jsonReader = Json.createReader(fis);
+                JsonArray jsonArray = jsonReader.readArray();
 
-            for(int i=0; i<jsonArray.size(); i++){
-                JsonObject mail=jsonArray.getJsonObject(i);
-                JsonArray destArray= mail.getJsonArray("destinatari");
-                List<String> dests=new ArrayList<>();
-                for (JsonValue s : destArray) {
-                    dests.add(s.toString());
+                fis.close();
+
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JsonObject mail = jsonArray.getJsonObject(i);
+                    JsonArray destArray = mail.getJsonArray("destinatari");
+                    List<String> dests = new ArrayList<>();
+                    for (JsonValue s : destArray) {
+                        dests.add(s.toString());
+                    }
+                    Email e = new Email(mail.getString("mittente"), dests, mail.getString("oggetto"), mail.getString("testo"),
+                            mail.getString("data"));
+                    e.setId(mail.getInt("id"));
+
+                    if (e.getId() > lastID) {
+                        casella.add(e);
+                    }
+
                 }
-                Email e = new Email(mail.getString("mittente"), dests, mail.getString("oggetto"), mail.getString("testo"),
-                        mail.getString("data"));
-                e.setId(mail.getInt("id"));
-
-                if(e.getId()>lastID){
-                    casella.add(e);
-                }
-
+                jsonReader.close();
             }
-            jsonReader.close();
+
+        }finally {
+            readWriteLock.readLock().unlock();
         }
         return casella;
-
 
     }
 
 
     private void  scriviCasella(String email, List<Email> lettere) throws FileNotFoundException {
-            JsonArrayBuilder mailListBuilder = Json.createArrayBuilder();
-            for (Email e : lettere) {
+        readWriteLock.writeLock().lock();
+            try {
+                JsonArrayBuilder mailListBuilder = Json.createArrayBuilder();
+                for (Email e : lettere) {
 
-                JsonObjectBuilder mailBuilder = Json.createObjectBuilder();
-                JsonArrayBuilder destsBuilder = Json.createArrayBuilder();
-                for (int i = 0; i < e.destinatari.size(); i++) {
-                    destsBuilder.add(e.destinatari.get(i).substring(0,e.destinatari.get(i).toString().length()).replace("\"", ""));
+                    JsonObjectBuilder mailBuilder = Json.createObjectBuilder();
+                    JsonArrayBuilder destsBuilder = Json.createArrayBuilder();
+                    for (int i = 0; i < e.destinatari.size(); i++) {
+                        destsBuilder.add(e.destinatari.get(i).substring(0, e.destinatari.get(i).toString().length()).replace("\"", ""));
+                    }
+                    //inserisco tutti gli elementi della mail all'interno di un oggetto json
+                    mailBuilder.add("id", e.id)
+                            .add("mittente", e.mittente)
+                            .add("destinatari", destsBuilder)
+                            .add("oggetto", e.oggetto)
+                            .add("testo", e.testo)
+                            .add("data", e.data);
+                    mailListBuilder.add(mailBuilder);
                 }
-                //inserisco tutti gli elementi della mail all'interno di un oggetto json
-                mailBuilder.add("id", e.id)
-                        .add("mittente", e.mittente)
-                        .add("destinatari", destsBuilder)
-                        .add("oggetto", e.oggetto)
-                        .add("testo", e.testo)
-                        .add("data", e.data);
-                mailListBuilder.add(mailBuilder);
+                JsonArray mailJsonObj = mailListBuilder.build();//costruisco tale array
+                //creo un nuovo file (o lo sovrascrivo) e lo salvo all'interno della cartella riservata all'utente
+                //che differenzio in base all'id
+                OutputStream os = new FileOutputStream(dataPathCasella(email));
+                JsonWriter jsonWriter = Json.createWriter(os);
+                jsonWriter.writeArray(mailJsonObj);
+                //per scrivere infine l'array json all'interno del file
+                jsonWriter.close();
+            }finally {
+                readWriteLock.writeLock().unlock();
             }
-            JsonArray mailJsonObj = mailListBuilder.build();//costruisco tale array
-            //creo un nuovo file (o lo sovrascrivo) e lo salvo all'interno della cartella riservata all'utente
-            //che differenzio in base all'id
-            OutputStream os = new FileOutputStream( dataPathCasella(email));
-            JsonWriter jsonWriter = Json.createWriter(os);
-            jsonWriter.writeArray(mailJsonObj);
-            //per scrivere infine l'array json all'interno del file
-            jsonWriter.close();
 
     }
 
@@ -317,8 +332,8 @@ public class ServerController implements Initializable {
 
     private String dataPathCasella(String email) {
         String[] s=email.split("@");
-        //return "C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
-        return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
+        return "C:\\Users\\ilmit\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
+        //return "C:\\Users\\Dili\\Desktop\\PRO3-PROGETTO\\PROG3-PROGETTO\\src\\main\\java\\com\\example\\prog3progetto\\Server\\CASELLE\\" + s[0] + ".json";
 
     }
 

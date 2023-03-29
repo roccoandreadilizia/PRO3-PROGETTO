@@ -6,8 +6,6 @@ public class Utente implements Serializable {
 
     private String email;
 
-
-
     private String headerEmail;
 
     public Utente(String email) {

@@ -159,7 +159,7 @@ public class ClientModel {
             }
 
         } catch (ConnectException ce) {
-            //ClientController.startAlert("Server Offline, prova a riconnetterti");
+            startNegativeAlert("Server Offline, prova a riconnetterti");
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
